@@ -1,0 +1,122 @@
+/* Food Link — clean white storefront, category carousel + product grid */
+
+.announcement-bar-section .utility-bar--bottom-border {
+  border-bottom: 1px solid rgba(18, 18, 18, 0.08);
+}
+
+.collection__title-heading-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+}
+
+.collection__title--has-inline-view-all .collection__title-heading-row .title {
+  margin-bottom: 0;
+}
+
+.collection__heading-view-all {
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+@media screen and (max-width: 749px) {
+  .collection__title-heading-row .collection__heading-view-all {
+    margin-left: auto;
+  }
+}
+
+.section-collection-list .title-wrapper-with-link {
+  justify-content: flex-start;
+}
+
+.section-collection-list .slider-buttons {
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+/* Rounded product image: Dawn's inner radius can be ≤0 when padding is large vs corner radius */
+.product-card-wrapper .card--standard .card__inner .card__media {
+  border-radius: max(0.6rem,
+      calc(var(--border-radius) - var(--border-width) - var(--image-padding)));
+}
+
+.product-card-wrapper .card--standard .card__inner .card__media .media {
+  border-radius: inherit;
+}
+
+/* Card style: single bordered card; image only rounded on top */
+.product-card-wrapper .card--card .card__inner .card__media {
+  border-top-left-radius: max(0.6rem,
+      calc(var(--border-radius) - var(--border-width) - var(--image-padding)));
+  border-top-right-radius: max(0.6rem,
+      calc(var(--border-radius) - var(--border-width) - var(--image-padding)));
+}
+
+.product-card-wrapper .card--card .card__inner .card__media .media {
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+
+/* Product card stack: price → title → rating → Buy now (all inside card border) */
+.product-card-wrapper .card--card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.product-card-wrapper .card--card>.card__content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.2rem 1.2rem 1.4rem;
+  row-gap: 0.4rem;
+}
+
+.product-card-wrapper .card--card .card__information {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card-wrapper .product-card__title {
+  font-weight: 700;
+}
+
+.product-card-wrapper .product-card__price {
+  font-weight: 400;
+}
+
+.product-card-wrapper .product-card__rating-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+}
+
+.product-card-wrapper .product-card__rating-row .rating {
+  margin: 0;
+}
+
+.product-card-wrapper .product-card__rating-row .rating-count {
+  margin: 0;
+}
+
+.product-card-wrapper .product-card__buy-now {
+  margin-top: 0.75rem;
+  border-radius: 9999px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.product-card-wrapper .product-card__buy-now.disabled {
+  opacity: 0.55;
+  pointer-events: none;
+  cursor: default;
+}
+
+.product-card-wrapper .card--card>.card__content>.quick-add {
+  margin-top: 0.75rem;
+}
