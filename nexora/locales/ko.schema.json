@@ -3396,6 +3396,9 @@
       "presets": {
         "name": "빠른 주문 목록"
       }
+    },
+    "main-wishlist": {
+      "name": "Wishlist page"
     }
   }
 }

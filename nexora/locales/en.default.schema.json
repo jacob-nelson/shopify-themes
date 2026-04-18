@@ -1910,6 +1910,9 @@
     "main-page": {
       "name": "Page"
     },
+    "main-wishlist": {
+      "name": "Wishlist page"
+    },
     "main-password-footer": {
       "name": "Password footer"
     },

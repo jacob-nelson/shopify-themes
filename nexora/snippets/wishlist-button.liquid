@@ -1,0 +1,21 @@
+{% comment %}
+  Wishlist toggle (pairs with assets/wishlist.js).
+
+  Accepts:
+  - product: {Object} Product (required)
+  - context: {String} 'product' | 'card' — affects layout only (optional)
+
+  Usage:
+  {% render 'wishlist-button', product: product, context: 'product' %}
+{% endcomment %}
+{%- if product != blank -%}
+  <button
+    type="button"
+    class="wishlist-btn{% if context == 'card' %} wishlist-btn--card{% else %} wishlist-btn--product{% endif %}"
+    data-product-handle="{{ product.handle }}"
+    aria-pressed="false"
+    aria-label="{{ 'general.wishlist.add_to_wishlist' | t }}"
+  >
+    <span class="svg-wrapper wishlist-btn__icon">{{ 'icon-heart.svg' | inline_asset_content }}</span>
+  </button>
+{%- endif -%}

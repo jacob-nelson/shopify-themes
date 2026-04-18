@@ -3396,6 +3396,9 @@
       "presets": {
         "name": "Pikatilausluettelo"
       }
+    },
+    "main-wishlist": {
+      "name": "Wishlist page"
     }
   }
 }

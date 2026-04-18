@@ -1,0 +1,23 @@
+{% comment %}
+  Renders one trust feature card. Accepts: block
+{% endcomment %}
+<article class="about-fl-trust__card" {{ block.shopify_attributes }}>
+  <div class="about-fl-trust__card-icon">
+    {%- if block.settings.custom_icon != blank -%}
+      {%- assign card_icon_alt = block.settings.title | default: 'Feature' | strip | escape -%}
+      {{
+        block.settings.custom_icon
+        | image_url: width: 96
+        | image_tag: loading: 'lazy', widths: '48, 96', alt: card_icon_alt
+      }}
+    {%- else -%}
+      {% render 'about-fl-card-icon', icon: block.settings.icon %}
+    {%- endif -%}
+  </div>
+  {%- if block.settings.title != blank -%}
+    <h3 class="about-fl-trust__card-title">{{ block.settings.title | escape }}</h3>
+  {%- endif -%}
+  {%- if block.settings.text != blank -%}
+    <div class="about-fl-trust__card-text rte">{{ block.settings.text }}</div>
+  {%- endif -%}
+</article>

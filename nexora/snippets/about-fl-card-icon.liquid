@@ -1,0 +1,37 @@
+{% comment %} Inline icons for About trust cards (stroke currentColor). {% endcomment %}
+{%- case icon -%}
+  {%- when 'hands' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M11 14h2a2 2 0 002-2v-3h1.5a2.5 2.5 0 012.5 2.5V15a3 3 0 01-3 3h-1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M8.5 11.5V9A2.5 2.5 0 0111 6.5h2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M7 15H6a3 3 0 01-3-3v-1.5A2.5 2.5 0 015.5 8H7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  {%- when 'branches' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="6" cy="6" r="2.2" stroke="currentColor" stroke-width="1.7"/>
+      <circle cx="18" cy="8" r="2.2" stroke="currentColor" stroke-width="1.7"/>
+      <circle cx="12" cy="18" r="2.2" stroke="currentColor" stroke-width="1.7"/>
+      <path d="M7.5 7.5L10.5 11M16.5 9.5L13.5 13M12 15.5l-1.5-3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </svg>
+  {%- when 'layers' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 3l8 4.5v3L12 15 4 10.5v-3L12 3z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+      <path d="M4 14l8 4.5L20 14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M4 17.5L12 22l8-4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  {%- when 'route' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="7" cy="7" r="2.2" stroke="currentColor" stroke-width="1.7"/>
+      <circle cx="17" cy="17" r="2.2" stroke="currentColor" stroke-width="1.7"/>
+      <path d="M8.5 8.5l7 7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      <path d="M14 6h4v4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  {%- when 'horeca' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M4 10h16v9a2 2 0 01-2 2H6a2 2 0 01-2-2v-9z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+      <path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      <path d="M9 15h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </svg>
+  {%- else -%}
+    <span class="svg-wrapper">{{ 'icon-star.svg' | inline_asset_content }}</span>
+{%- endcase -%}

@@ -3396,6 +3396,9 @@
       "presets": {
         "name": "Lista de encomendas rápida"
       }
+    },
+    "main-wishlist": {
+      "name": "Wishlist page"
     }
   }
 }

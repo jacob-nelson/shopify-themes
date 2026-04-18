@@ -55,6 +55,17 @@
       "next_slide": "Faire glisser vers la droite",
       "previous_slide": "Faire glisser vers la gauche",
       "name": "Carrousel"
+    },
+    "wishlist": {
+      "title": "Wishlist",
+      "add_to_wishlist": "Add to wishlist",
+      "remove_from_wishlist_aria": "Remove from wishlist",
+      "link_with_count": "Wishlist ([count])",
+      "view_product": "View product",
+      "remove": "Remove",
+      "loading": "Loading your wishlist…",
+      "empty": "Your wishlist is empty. Save items you love from product pages.",
+      "product_image_alt": "[title]"
     }
   },
   "newsletter": {

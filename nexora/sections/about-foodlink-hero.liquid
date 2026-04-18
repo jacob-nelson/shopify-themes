@@ -1,0 +1,230 @@
+{{ 'section-about-foodlink.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  #about-fl-hero-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+  @media screen and (min-width: 750px) {
+    #about-fl-hero-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+  .about-fl-hero-{{ section.id }} {
+    --about-fl-hero-heading: {{ section.settings.heading_color }};
+    --about-fl-hero-accent: {{ section.settings.accent_color }};
+  }
+{%- endstyle -%}
+
+<section
+  id="about-fl-hero-{{ section.id }}"
+  class="about-fl-hero about-fl-hero-{{ section.id }} section-{{ section.id }}"
+>
+  <div class="about-fl-hero__inner">
+    <div class="about-fl-hero__grid">
+      <div class="about-fl-hero__content">
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="about-fl-hero__eyebrow">
+            {%- if section.settings.show_eyebrow_icon -%}
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/>
+                <path d="M12 7v5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            {%- endif -%}
+            {{ section.settings.eyebrow | escape }}
+          </p>
+        {%- endif -%}
+
+        {%- if section.settings.heading != blank -%}
+          <h1 class="about-fl-hero__title {{ section.settings.heading_size }}">
+            {{- section.settings.heading | escape | newline_to_br -}}
+          </h1>
+        {%- endif -%}
+
+        {%- if section.settings.intro != blank -%}
+          <div class="about-fl-hero__intro rte">{{ section.settings.intro }}</div>
+        {%- endif -%}
+
+        <div class="about-fl-hero__split">
+          {%- if section.settings.vision_title != blank or section.settings.vision_text != blank -%}
+            <div class="about-fl-hero__pillar">
+              <div class="about-fl-hero__pillar-head">
+                <span class="about-fl-hero__pillar-icon" aria-hidden="true">
+                  <span class="svg-wrapper">{{ 'icon-eye.svg' | inline_asset_content }}</span>
+                </span>
+                {%- if section.settings.vision_title != blank -%}
+                  <h2 class="about-fl-hero__pillar-title">{{ section.settings.vision_title | escape }}</h2>
+                {%- endif -%}
+              </div>
+              {%- if section.settings.vision_text != blank -%}
+                <div class="about-fl-hero__pillar-body rte">{{ section.settings.vision_text }}</div>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
+          {%- if section.settings.mission_title != blank or section.settings.mission_text != blank -%}
+            <div class="about-fl-hero__pillar">
+              <div class="about-fl-hero__pillar-head">
+                <span class="about-fl-hero__pillar-icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.6"/>
+                    <circle cx="12" cy="12" r="6" stroke="currentColor" stroke-width="1.6"/>
+                    <circle cx="12" cy="12" r="2.2" fill="currentColor"/>
+                  </svg>
+                </span>
+                {%- if section.settings.mission_title != blank -%}
+                  <h2 class="about-fl-hero__pillar-title">{{ section.settings.mission_title | escape }}</h2>
+                {%- endif -%}
+              </div>
+              {%- if section.settings.mission_text != blank -%}
+                <div class="about-fl-hero__pillar-body rte">{{ section.settings.mission_text }}</div>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <div class="about-fl-hero__media">
+        {%- if section.settings.image != blank -%}
+          {%- assign widths = '375, 550, 750, 1100, 1500' -%}
+          {%- assign sizes = '(min-width: 990px) 42vw, 100vw' -%}
+          {%- assign hero_image_alt = section.settings.image.alt | default: section.settings.heading | strip -%}
+          {{
+            section.settings.image
+            | image_url: width: 1500
+            | image_tag: loading: 'lazy', sizes: sizes, widths: widths, alt: hero_image_alt
+          }}
+        {%- else -%}
+          {{ 'detailed-apparel-1' | placeholder_svg_tag: 'placeholder-svg' }}
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "About — Food Link hero",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Hero image"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_eyebrow_icon",
+      "label": "Show icon next to eyebrow",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "ABOUT US"
+    },
+    {
+      "type": "textarea",
+      "id": "heading",
+      "label": "Heading",
+      "default": "The gateway for brands to the gulf"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "options": [
+        { "value": "h2", "label": "Large" },
+        { "value": "h1", "label": "Extra large" },
+        { "value": "h0", "label": "Display" }
+      ],
+      "default": "h0"
+    },
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "Introduction",
+      "default": "<p>Food Link was founded to bridge the gap between international food brands and the Gulf region's dynamic retail and hospitality landscape. We combine regional expertise with global standards to help partners grow with confidence.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Vision & mission"
+    },
+    {
+      "type": "text",
+      "id": "vision_title",
+      "label": "Vision title",
+      "default": "Our Vision"
+    },
+    {
+      "type": "richtext",
+      "id": "vision_text",
+      "label": "Vision text",
+      "default": "<p>To be the most trusted distribution partner connecting exceptional brands with consumers across the Gulf.</p>"
+    },
+    {
+      "type": "text",
+      "id": "mission_title",
+      "label": "Mission title",
+      "default": "Our Mission"
+    },
+    {
+      "type": "richtext",
+      "id": "mission_text",
+      "label": "Mission text",
+      "default": "<p>To deliver end-to-end value through insight, execution, and long-term partnerships that elevate every brand we represent.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#0a3d4a"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent (vision/mission)",
+      "default": "#0d5c6e"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 56
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 56
+    }
+  ],
+  "presets": [
+    {
+      "name": "About — Food Link hero"
+    }
+  ]
+}
+{% endschema %}

@@ -257,6 +257,7 @@
 
     {{ 'base.css' | asset_url | stylesheet_tag }}
     {{ 'food-link.css' | asset_url | stylesheet_tag }}
+    {{ 'component-wishlist.css' | asset_url | stylesheet_tag }}
     <link rel="stylesheet" href="{{ 'component-cart-items.css' | asset_url }}" media="print" onload="this.media='all'">
 
     {%- if settings.cart_type == 'drawer' -%}
@@ -324,12 +325,24 @@
     <script>
       window.shopUrl = '{{ request.origin }}';
       window.routes = {
+        root_url: '{{ routes.root_url }}',
         cart_add_url: '{{ routes.cart_add_url }}',
         cart_change_url: '{{ routes.cart_change_url }}',
         cart_update_url: '{{ routes.cart_update_url }}',
         cart_url: '{{ routes.cart_url }}',
         predictive_search_url: '{{ routes.predictive_search_url }}',
       };
+
+      window.wishlistStrings = {
+        title: {{ 'general.wishlist.title' | t | json }},
+        add: {{ 'general.wishlist.add_to_wishlist' | t | json }},
+        remove: {{ 'general.wishlist.remove_from_wishlist_aria' | t | json }},
+        link_with_count: {{ 'general.wishlist.link_with_count' | t | json }},
+        view_product: {{ 'general.wishlist.view_product' | t | json }},
+        remove_from_wishlist: {{ 'general.wishlist.remove' | t | json }},
+        product_image_alt: {{ 'general.wishlist.product_image_alt' | t | json }},
+      };
+      window.wishlistCurrency = {{ cart.currency.iso_code | json }};
 
       window.cartStrings = {
         error: `{{ 'sections.cart.cart_error' | t }}`,
@@ -373,5 +386,7 @@
     {%- if settings.cart_type == 'drawer' -%}
       <script src="{{ 'cart-drawer.js' | asset_url }}" defer="defer"></script>
     {%- endif -%}
+
+    <script src="{{ 'wishlist.js' | asset_url }}" defer="defer"></script>
   </body>
 </html>

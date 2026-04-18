@@ -1,0 +1,85 @@
+{
+  "sections": {
+    "about_fl_hero": {
+      "type": "about-foodlink-hero",
+      "settings": {
+        "show_eyebrow_icon": true,
+        "eyebrow": "ABOUT US",
+        "heading": "The gateway for brands to the gulf",
+        "heading_size": "h0",
+        "intro": "<p>Food Link began as a consultancy helping food businesses with research, marketing, and brand building. As the Gulf grew, we grew with it—expanding across Saudi Arabia, Bahrain, Kuwait, Oman, Qatar, and the UAE.</p><p>Today we are one of the region’s leading food marketing and distribution partners, working with globally recognised brands and local operators alike.</p>",
+        "vision_title": "Our Vision",
+        "vision_text": "<p>To be the most trusted gateway between exceptional food brands and the people and places that shape how the Gulf eats, shops, and experiences food.</p>",
+        "mission_title": "Our Mission",
+        "mission_text": "<p>To combine regional insight, disciplined execution, and long-term partnerships so every brand we represent wins in retail, e‑commerce, and foodservice.</p>",
+        "heading_color": "#0a3d4a",
+        "accent_color": "#0d5c6e",
+        "padding_top": 56,
+        "padding_bottom": 56
+      }
+    },
+    "about_fl_trust": {
+      "type": "about-foodlink-trust",
+      "blocks": {
+        "trust_1": {
+          "type": "feature",
+          "settings": {
+            "icon": "hands",
+            "title": "Decades of experience",
+            "text": "<p>Category depth, regulatory fluency, and relationships built over years—not quarters.</p>"
+          }
+        },
+        "trust_2": {
+          "type": "feature",
+          "settings": {
+            "icon": "branches",
+            "title": "Strong regional networks",
+            "text": "<p>On-the-ground teams and channel access that accelerate listings, distribution, and visibility.</p>"
+          }
+        },
+        "trust_3": {
+          "type": "feature",
+          "settings": {
+            "icon": "layers",
+            "title": "Retail differentiation",
+            "text": "<p>Merchandising, pricing, and activation that help brands stand out in crowded aisles and online.</p>"
+          }
+        },
+        "trust_4": {
+          "type": "feature",
+          "settings": {
+            "icon": "route",
+            "title": "End-to-end solutions",
+            "text": "<p>From import to shelf: one coordinated partner for logistics, compliance, and go-to-market.</p>"
+          }
+        },
+        "trust_5": {
+          "type": "feature",
+          "settings": {
+            "icon": "horeca",
+            "title": "HORECA",
+            "text": "<p>Dedicated programs for hotels, restaurants, and cafés—tailored for operators and chefs.</p>"
+          }
+        }
+      },
+      "block_order": ["trust_1", "trust_2", "trust_3", "trust_4", "trust_5"],
+      "settings": {
+        "show_eyebrow_icon": true,
+        "eyebrow": "WHAT WE OFFER FOR YOU",
+        "heading": "Why brands trust food link",
+        "heading_size": "h1",
+        "navy_color": "#061a2e",
+        "teal_color": "#0a6b72",
+        "cta_show": true,
+        "cta_stat": "<p><strong>95+</strong> Connecting global brands to the gulf</p>",
+        "cta_stat_sub": "Your universal path to success",
+        "cta_copy": "<p>Our team is here to answer your questions and help you get started on turning your vision into reality.</p>",
+        "cta_button_label": "Get Started",
+        "cta_button_link": "",
+        "padding_top": 64,
+        "padding_bottom": 64
+      }
+    }
+  },
+  "order": ["about_fl_hero", "about_fl_trust"]
+}

@@ -3396,6 +3396,9 @@
       "presets": {
         "name": "Hurtigordreliste"
       }
+    },
+    "main-wishlist": {
+      "name": "Wishlist page"
     }
   }
 }

@@ -270,6 +270,24 @@
         {%- endcase -%}
       {%- endfor -%}
 
+      {%- liquid
+        assign wishlist_page = pages.wishlist
+        if wishlist_page != blank
+          assign wishlist_url = wishlist_page.url
+        else
+          assign wishlist_url = routes.root_url | append: 'pages/wishlist'
+        endif
+      -%}
+      <a
+        href="{{ wishlist_url }}"
+        class="header__icon header__icon--wishlist link focus-inset"
+        id="wishlist-icon-link"
+        aria-label="{{ 'general.wishlist.title' | t }}"
+      >
+        <span class="svg-wrapper">{{ 'icon-heart.svg' | inline_asset_content }}</span>
+        <span class="wishlist-count-bubble" hidden></span>
+      </a>
+
       <a href="{{ routes.cart_url }}" class="header__icon header__icon--cart link focus-inset" id="cart-icon-bubble">
           {% if cart == empty %}
             <span class="svg-wrapper">{{'icon-cart-empty.svg' | inline_asset_content }}</span>

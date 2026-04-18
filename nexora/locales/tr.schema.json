@@ -3396,6 +3396,9 @@
       "presets": {
         "name": "Hızlı sipariş listesi"
       }
+    },
+    "main-wishlist": {
+      "name": "Wishlist page"
     }
   }
 }

@@ -3396,6 +3396,9 @@
       "presets": {
         "name": "รายการคำสั่งซื้อแบบด่วน"
       }
+    },
+    "main-wishlist": {
+      "name": "Wishlist page"
     }
   }
 }
