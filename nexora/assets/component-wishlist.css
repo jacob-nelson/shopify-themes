@@ -19,16 +19,53 @@
 }
 
 .wishlist-btn--active {
-  color: rgb(var(--color-link));
+  color: #c4122e;
 }
 
 .wishlist-btn--active:hover {
-  color: rgb(var(--color-link));
+  color: #9e0f25;
 }
 
 .wishlist-btn__icon svg {
   width: 2rem;
   height: 2rem;
+}
+
+.wishlist-btn__icon svg,
+.wishlist-btn__icon svg path {
+  fill: currentColor;
+  stroke: none;
+}
+
+/* evenodd + compound path draws a “ring”; nonzero fills a solid heart */
+.wishlist-btn--active .wishlist-btn__icon svg path {
+  fill: #c4122e;
+  fill-rule: nonzero;
+}
+
+.wishlist-btn--active:hover .wishlist-btn__icon svg path {
+  fill: #9e0f25;
+}
+
+/*
+ * Header: `.header__icon .icon { fill: none }` applies to the <svg>; fill inherits to <path>,
+ * so the heart disappears unless we set fill on the path (presentation attrs lose to inherit).
+ */
+.header__icon--wishlist .svg-wrapper svg.icon path {
+  fill: #c4122e !important;
+  fill-rule: nonzero !important;
+  stroke: none !important;
+}
+
+.header__icon--wishlist:hover .svg-wrapper svg.icon path {
+  fill: #9e0f25 !important;
+}
+
+/* Badge matches cart dimensions; high contrast on red heart */
+.header__icon--wishlist .wishlist-count-bubble {
+  background-color: rgb(var(--color-foreground));
+  color: rgb(var(--color-background));
+  font-weight: 600;
 }
 
 .wishlist-btn--card {
@@ -66,17 +103,21 @@
   position: relative;
 }
 
+/* Use a div (not span) so base.css `.header__icon span { height: 100% }` does not stretch the badge. */
 .wishlist-count-bubble {
   position: absolute;
   left: 2.2rem;
-  bottom: 1.7rem;
+  bottom: 0.8rem;
   min-width: 1.7rem;
   height: 1.7rem;
   padding: 0 0.4rem;
   border-radius: 100%;
   font-size: 0.9rem;
-  line-height: 1.7rem;
-  text-align: center;
+  line-height: calc(1 + 0.1 / var(--font-body-scale));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   background-color: rgb(var(--color-button));
   color: rgb(var(--color-button-text));
 }

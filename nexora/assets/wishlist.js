@@ -45,6 +45,80 @@
     return base + 'products/' + encodeURIComponent(handle) + '.js';
   }
 
+  function storefrontGraphqlUrl() {
+    const root = window.routes && window.routes.root_url ? window.routes.root_url : '/';
+    const base = root.endsWith('/') ? root : root + '/';
+    return base + 'api/2025-01/graphql.json';
+  }
+
+  function storefrontAccessToken() {
+    return (window.wishlistStorefrontAccessToken || '').trim();
+  }
+
+  /**
+   * Batch-load wishlist products via Storefront API (same token as theme settings).
+   * Returns shapes compatible with minVariantCents / render (mirrors /products/*.js).
+   */
+  async function fetchProductsViaStorefront(handles, token) {
+    const CHUNK = 20;
+    const map = {};
+    const gql =
+      'query WishlistProducts($query: String!) { products(first: 50, query: $query) { edges { node { handle title featuredImage { url } priceRange { minVariantPrice { amount } } } } } }';
+
+    for (let c = 0; c < handles.length; c += CHUNK) {
+      const slice = handles.slice(c, c + CHUNK);
+      const queryStr = slice
+        .map(function (h) {
+          return 'handle:' + String(h).trim();
+        })
+        .join(' OR ');
+      if (!queryStr) continue;
+
+      const res = await fetch(storefrontGraphqlUrl(), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Storefront-Access-Token': token,
+        },
+        body: JSON.stringify({ query: gql, variables: { query: queryStr } }),
+      });
+
+      const json = await res.json();
+      if (!res.ok) {
+        throw new Error('Storefront HTTP ' + res.status);
+      }
+      if (json.errors && json.errors.length) {
+        throw new Error(json.errors[0].message || 'Storefront GraphQL error');
+      }
+      const edges = json.data && json.data.products && json.data.products.edges;
+      if (!edges) continue;
+      edges.forEach(function (edge) {
+        const n = edge && edge.node;
+        if (n && n.handle) map[n.handle] = n;
+      });
+    }
+
+    const kept = [];
+    const products = [];
+    handles.forEach(function (h) {
+      const n = map[h];
+      if (!n) return;
+      const amount = n.priceRange && n.priceRange.minVariantPrice && n.priceRange.minVariantPrice.amount;
+      const cents = amount != null && amount !== '' ? Math.round(parseFloat(String(amount), 10) * 100) : 0;
+      const imgUrl = n.featuredImage && n.featuredImage.url;
+      kept.push(h);
+      products.push({
+        handle: n.handle,
+        title: n.title,
+        featured_image: imgUrl ? { src: imgUrl } : null,
+        images: imgUrl ? [{ src: imgUrl }] : [],
+        variants: [{ price: cents }],
+        url: '',
+      });
+    });
+    return { kept: kept, products: products };
+  }
+
   function formatMoney(cents) {
     const code = (window.wishlistCurrency || 'USD').toString();
     try {
@@ -171,12 +245,12 @@
             '<div class="wishlist-card">' +
             (img
               ? '<a class="wishlist-card__media" href="' +
-                url +
-                '"><img src="' +
-                img +
-                '" alt="' +
-                escapeAttr(title) +
-                '" loading="lazy" width="533" height="533"></a>'
+              url +
+              '"><img src="' +
+              img +
+              '" alt="' +
+              escapeAttr(title) +
+              '" loading="lazy" width="533" height="533"></a>'
               : '') +
             '<div class="wishlist-card__info">' +
             '<a class="wishlist-card__title h5" href="' +
@@ -224,18 +298,35 @@
       }
       if (loading) loading.hidden = false;
 
-      const kept = [];
-      const products = [];
-      for (let i = 0; i < list.length; i++) {
-        const handle = list[i];
+      const token = storefrontAccessToken();
+      let kept = [];
+      let products = [];
+
+      if (token) {
         try {
-          const res = await fetch(productJsonUrl(handle));
-          if (!res.ok) continue;
-          const p = await res.json();
-          kept.push(handle);
-          products.push(p);
+          const out = await fetchProductsViaStorefront(list, token);
+          kept = out.kept;
+          products = out.products;
         } catch {
-          /* skip */
+          kept = [];
+          products = [];
+        }
+      }
+
+      if (!token || (list.length && !products.length)) {
+        kept = [];
+        products = [];
+        for (let i = 0; i < list.length; i++) {
+          const handle = list[i];
+          try {
+            const res = await fetch(productJsonUrl(handle));
+            if (!res.ok) continue;
+            const p = await res.json();
+            kept.push(handle);
+            products.push(p);
+          } catch {
+            /* skip */
+          }
         }
       }
 

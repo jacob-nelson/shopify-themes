@@ -343,6 +343,7 @@
         product_image_alt: {{ 'general.wishlist.product_image_alt' | t | json }},
       };
       window.wishlistCurrency = {{ cart.currency.iso_code | json }};
+      window.wishlistStorefrontAccessToken = {{ settings.storefront_access_token | strip | json }};
 
       window.cartStrings = {
         error: `{{ 'sections.cart.cart_error' | t }}`,

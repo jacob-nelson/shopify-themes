@@ -2,7 +2,7 @@
   {
     "name": "theme_info",
     "theme_name": "Nexora",
-    "theme_version": "1.0.6",
+    "theme_version": "1.0.9",
     "theme_author": "Based on Shopify Dawn",
     "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
     "theme_support_url": "https://support.shopify.com/"
@@ -1449,6 +1449,25 @@
         "id": "cart_color_scheme",
         "label": "t:sections.all.colors.label",
         "default": "scheme-1"
+      }
+    ]
+  },
+  {
+    "name": "Wishlist",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Storefront API"
+      },
+      {
+        "type": "paragraph",
+        "content": "Optional. When set, the wishlist page can load saved products with the Storefront GraphQL API. Create a Headless or custom app in Shopify admin, enable the Storefront API, and paste only the Storefront access token here — never the Admin API secret key."
+      },
+      {
+        "type": "text",
+        "id": "storefront_access_token",
+        "label": "Storefront API access token",
+        "info": "Use a token with minimal scopes (for example unauthenticated_read_product_listings). It is included in storefront HTML; rotate the token in admin if it is ever leaked."
       }
     ]
   }
