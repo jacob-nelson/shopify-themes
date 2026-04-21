@@ -1,7 +1,25 @@
 {% comment %}
   Renders one trust feature card. Accepts: block
+  End-to-end: icon "route" (preset) or block setting end_to_end_card.
 {% endcomment %}
-<article class="about-fl-trust__card" {{ block.shopify_attributes }}>
+{%- liquid
+  assign is_end_to_end = false
+  if block.settings.end_to_end_card
+    assign is_end_to_end = true
+  elsif block.settings.icon == 'route'
+    assign is_end_to_end = true
+  endif
+  assign is_horeca = false
+  if block.settings.horeca_wide_card
+    assign is_horeca = true
+  elsif block.settings.icon == 'horeca'
+    assign is_horeca = true
+  endif
+-%}
+<article
+  class="{% if is_end_to_end %}end-to-end-solutions{% else %}about-fl-trust__card{% endif %}{% if is_horeca %} horeca-card{% endif %}"
+  {{ block.shopify_attributes }}
+>
   <div class="about-fl-trust__card-icon">
     {%- if block.settings.custom_icon != blank -%}
       {%- assign card_icon_alt = block.settings.title | default: 'Feature' | strip | escape -%}

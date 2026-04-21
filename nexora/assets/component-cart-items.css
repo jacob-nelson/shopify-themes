@@ -19,6 +19,16 @@ cart-items .title-wrapper-with-link {
   display: flex;
 }
 
+.cart-item__quantity-wrapper:has(.cart-item__moq-note) {
+  flex-wrap: wrap;
+}
+
+.cart-item__moq-note {
+  flex-basis: 100%;
+  margin-top: 0.4rem;
+  margin-bottom: 0;
+}
+
 .cart-item__totals {
   position: relative;
 }

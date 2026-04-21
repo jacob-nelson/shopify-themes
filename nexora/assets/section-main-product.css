@@ -355,6 +355,11 @@ a.product__text {
   margin-bottom: 0.6rem;
 }
 
+.product-form__moq-note:not(:empty) {
+  margin-top: 0.6rem;
+  margin-bottom: 0;
+}
+
 .price-per-item__label.form__label {
   margin-bottom: 0rem;
 }

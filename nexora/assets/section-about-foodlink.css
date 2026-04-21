@@ -198,43 +198,50 @@
 }
 
 .about-fl-trust__row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
   gap: 1.5rem;
 }
 
-.about-fl-trust__row--3 .about-fl-trust__card {
-  flex: 1 1 100%;
-  max-width: 38rem;
+/* First row: three equal columns (⅓ each) */
+.about-fl-trust__row--3 {
+  grid-template-columns: 1fr;
 }
 
 @media screen and (min-width: 750px) {
-  .about-fl-trust__row--3 .about-fl-trust__card {
-    flex: 1 1 calc(33.333% - 1.5rem);
-    max-width: none;
-    min-width: 0;
+  .about-fl-trust__row--3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-.about-fl-trust__row--2 .about-fl-trust__card {
-  flex: 1 1 100%;
-  max-width: 38rem;
+/* Second row: 3-column track — non-HORECA span 1 (⅓), HORECA spans 2 (⅔) */
+.about-fl-trust__row--2 {
+  grid-template-columns: 1fr;
 }
 
 @media screen and (min-width: 750px) {
-  .about-fl-trust__row--2 .about-fl-trust__card {
-    flex: 0 1 calc(50% - 1.5rem);
-    max-width: 42rem;
+  .about-fl-trust__row--2 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .about-fl-trust__row--2 .about-fl-trust__card,
+  .about-fl-trust__row--2 .end-to-end-solutions {
+    grid-column: span 1;
+  }
+
+  .about-fl-trust__row--2 .horeca-card {
+    grid-column: span 2;
   }
 }
 
-.about-fl-trust__card {
+/* Shared card shell (class is either .about-fl-trust__card or .end-to-end-solutions) */
+.about-fl-trust__card,
+.end-to-end-solutions {
   background: #ffffff;
   border-radius: var(--about-fl-card-radius);
   padding: 2rem 1.8rem 2.2rem;
   color: rgba(18, 18, 18, 0.88);
   box-shadow: 0 0.4rem 1.6rem rgba(0, 0, 0, 0.12);
+  min-width: 0;
 }
 
 .about-fl-trust__card-icon {

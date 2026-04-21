@@ -1,0 +1,31 @@
+{% comment %}
+  Outputs a single integer: effective MOQ from product `custom.moq` and variant MOQ.
+  Variant reads `custom.moq`, then `custom.variant_moq` if the first is unset or invalid.
+  Product and variant values are combined as the higher of the two (each side ignored if blank or <1; floor 1).
+
+  Accepts:
+  - product: {Object} product
+  - variant: {Object} variant
+{% endcomment %}
+{%- liquid
+  assign moq_combined = 1
+  assign pv = product.metafields.custom.moq.value
+  assign vv = blank
+  if variant.metafields.custom.moq.value != blank and variant.metafields.custom.moq.value >= 1
+    assign vv = variant.metafields.custom.moq.value
+  endif
+  if variant.metafields.custom.variant_moq.value != blank and variant.metafields.custom.variant_moq.value >= 1
+    if vv == blank or variant.metafields.custom.variant_moq.value > vv
+      assign vv = variant.metafields.custom.variant_moq.value
+    endif
+  endif
+  if pv != blank and pv >= 1
+    assign moq_combined = pv
+  endif
+  if vv != blank
+    if vv > moq_combined
+      assign moq_combined = vv
+    endif
+  endif
+  echo moq_combined
+-%}

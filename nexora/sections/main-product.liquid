@@ -239,6 +239,19 @@
                     | item_count_for_variant: product.selected_or_first_available_variant.id
                   -%}
                   {% # theme-check-enable %}
+                  {%- capture product_moq_capture -%}
+                    {%- render 'moq-combined-min',
+                      product: product,
+                      variant: product.selected_or_first_available_variant
+                    -%}
+                  {%- endcapture -%}
+                  {%- liquid
+                    assign product_page_moq = product_moq_capture | strip | plus: 0
+                    assign product_qty_min = product_page_moq
+                    if product.selected_or_first_available_variant.quantity_rule.min > product_qty_min
+                      assign product_qty_min = product.selected_or_first_available_variant.quantity_rule.min
+                    endif
+                  -%}
                   <span class="visually-hidden" id="quantity-label-{{ section.id }}">
                     {%- if cart_qty > 0 -%}
                       {{- 'products.product.quantity.in_cart_aria_label' | t: quantity: cart_qty -}}
@@ -277,14 +290,14 @@
                         name="quantity"
                         id="Quantity-{{ section.id }}"
                         data-cart-quantity="{{ cart_qty }}"
-                        data-min="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
-                        min="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
+                        data-min="{{ product_qty_min }}"
+                        min="{{ product_qty_min }}"
                         {% if product.selected_or_first_available_variant.quantity_rule.max != null %}
                           data-max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"
                           max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"
                         {% endif %}
                         step="{{ product.selected_or_first_available_variant.quantity_rule.increment }}"
-                        value="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
+                        value="{{ product_qty_min }}"
                         form="{{ product_form_id }}"
                       >
                       <button class="quantity__button" name="plus" type="button">
@@ -298,7 +311,7 @@
                     </quantity-input>
                     {%- liquid
                       assign volume_pricing_array = product.selected_or_first_available_variant.quantity_price_breaks | sort: 'quantity' | reverse
-                      assign current_qty_for_volume_pricing = cart_qty | plus: product.selected_or_first_available_variant.quantity_rule.min
+                      assign current_qty_for_volume_pricing = cart_qty | plus: product_qty_min
                       if cart_qty > 0
                         assign current_qty_for_volume_pricing = cart_qty | plus: product.selected_or_first_available_variant.quantity_rule.increment
                       endif
@@ -384,6 +397,11 @@
                       </price-per-item>
                     {%- endif -%}
                   </div>
+                  {%- if product_page_moq > 1 -%}
+                    <div class="product-form__moq-note caption">Minimum Order Quantity is {{ product_page_moq }}</div>
+                  {%- else -%}
+                    <div class="product-form__moq-note caption"></div>
+                  {%- endif -%}
                   <div class="quantity__rules caption" id="Quantity-Rules-{{ section.id }}">
                     {%- if product.selected_or_first_available_variant.quantity_rule.increment > 1 -%}
                       <span class="divider">
