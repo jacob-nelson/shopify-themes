@@ -2,7 +2,7 @@
   {
     "name": "theme_info",
     "theme_name": "Nexora",
-    "theme_version": "1.0.9",
+    "theme_version": "1.0.11",
     "theme_author": "Based on Shopify Dawn",
     "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
     "theme_support_url": "https://support.shopify.com/"
@@ -1455,6 +1455,18 @@
   {
     "name": "Wishlist",
     "settings": [
+      {
+        "type": "paragraph",
+        "content": "Wishlists are stored in the visitor’s browser (localStorage) unless you integrate a separate app. They do not sync across devices by default."
+      },
+      {
+        "type": "header",
+        "content": "B2B case quantities"
+      },
+      {
+        "type": "paragraph",
+        "content": "For logged-in B2B customers (Shopify customer.b2b?), add an integer product metafield custom.case_size (for example 12). When it is greater than the variant’s catalog quantity rules, the product page uses it as the quantity minimum and step. Create the definition under Settings → Custom data → Products. Use B2B catalog quantity rules or a checkout validation Function for hard enforcement."
+      },
       {
         "type": "header",
         "content": "Storefront API"

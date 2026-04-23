@@ -300,7 +300,7 @@
     </script>
   </head>
 
-  <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
+  <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}{% if customer and customer.b2b? %} b2b-customer{% endif %}">
     <a class="skip-to-content-link button visually-hidden" href="#MainContent">
       {{ 'accessibility.skip_to_text' | t }}
     </a>
@@ -344,6 +344,21 @@
       };
       window.wishlistCurrency = {{ cart.currency.iso_code | json }};
       window.wishlistStorefrontAccessToken = {{ settings.storefront_access_token | strip | json }};
+
+      window.nexoraB2b = {% if customer and customer.b2b? %}true{% else %}false{% endif %};
+      {%- if customer -%}
+      window.nexoraCustomerId = {{ customer.id | json }};
+      {%- else -%}
+      window.nexoraCustomerId = null;
+      {%- endif -%}
+      console.debug(
+        '[Nexora] Liquid: customer and customer.b2b? →',
+        {% if customer and customer.b2b? %}true{% else %}false{% endif %},
+        '| loggedIn:',
+        {% if customer %}true{% else %}false{% endif %},
+        '| customerId:',
+        window.nexoraCustomerId
+      );
 
       window.cartStrings = {
         error: `{{ 'sections.cart.cart_error' | t }}`,

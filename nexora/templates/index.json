@@ -185,11 +185,66 @@
                 "padding_top": 24,
                 "padding_bottom": 60
             }
+        },
+        "collection_list_BNnFip": {
+            "type": "collection-list",
+            "blocks": {
+                "featured_collection_t6xJLj": {
+                    "type": "featured_collection",
+                    "settings": {
+                        "collection": "happy-inside"
+                    }
+                },
+                "featured_collection_n4nPWd": {
+                    "type": "featured_collection",
+                    "settings": {
+                        "collection": "pri-bakes"
+                    }
+                },
+                "featured_collection_cM74Rm": {
+                    "type": "featured_collection",
+                    "settings": {
+                        "collection": "darrell-lea"
+                    }
+                }
+            },
+            "block_order": [
+                "featured_collection_t6xJLj",
+                "featured_collection_n4nPWd",
+                "featured_collection_cM74Rm"
+            ],
+            "name": "t:sections.collection-list.presets.name",
+            "settings": {
+                "title": "Brands we carry",
+                "heading_size": "h1",
+                "image_ratio": "square",
+                "columns_desktop": 3,
+                "enable_desktop_slider": false,
+                "color_scheme": "",
+                "show_view_all": false,
+                "columns_mobile": "1",
+                "swipe_on_mobile": false,
+                "padding_top": 36,
+                "padding_bottom": 0
+            }
+        },
+        "custom_liquid_fkJpMe": {
+            "type": "custom-liquid",
+            "custom_css": [],
+            "name": "t:sections.custom-liquid.presets.name",
+            "settings": {
+                "custom_liquid": "<div style=\"text-align: center; margin: 0;\">\n  <a href=\"/pages/brands-we-carry\"\n     style=\"\n       display: inline-block;\n       background-color: #000;\n       color: #fff;\n       padding: 10px 32px;\n       border-radius: 12px;\n       text-decoration: none;\n       font-size: 18px;\n       font-weight: 500;\n     \">\n    View all\n  </a>\n</div>",
+                "color_scheme": "",
+                "padding_top": 0,
+                "padding_bottom": 20
+            }
         }
     },
     "order": [
         "slideshow_MGatN6",
         "shop_categories",
-        "best_sellers"
+        "best_sellers",
+        "collection_list_BNnFip",
+        "custom_liquid_fkJpMe"
     ]
 }

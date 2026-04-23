@@ -1,0 +1,172 @@
+{
+    "sections": {
+        "main": {
+            "type": "main-page",
+            "disabled": true,
+            "settings": {
+                "padding_top": 28,
+                "padding_bottom": 28
+            }
+        },
+        "rich_text_7tpGVN": {
+            "type": "rich-text",
+            "blocks": {
+                "heading_7q4W3r": {
+                    "type": "heading",
+                    "settings": {
+                        "heading": "Brands we carry",
+                        "heading_size": "h1"
+                    }
+                }
+            },
+            "block_order": [
+                "heading_7q4W3r"
+            ],
+            "custom_css": [
+                "h2 {color: #0a3d4a !important; margin: 0 0 1.6rem; font-weight: 700; line-height: 1.12; letter-spacing: -0.02em;}"
+            ],
+            "name": "t:sections.rich-text.presets.name",
+            "settings": {
+                "desktop_content_position": "left",
+                "content_alignment": "left",
+                "color_scheme": "scheme-3",
+                "full_width": true,
+                "padding_top": 40,
+                "padding_bottom": 0
+            }
+        },
+        "collection_list_VQmn8J": {
+            "type": "collection-list",
+            "blocks": {
+                "featured_collection_XNDNKP": {
+                    "type": "featured_collection",
+                    "settings": {
+                        "collection": "happy-inside"
+                    }
+                },
+                "featured_collection_cX6kPX": {
+                    "type": "featured_collection",
+                    "settings": {
+                        "collection": "kuranda-wholefoods"
+                    }
+                },
+                "featured_collection_BMt3m7": {
+                    "type": "featured_collection",
+                    "settings": {
+                        "collection": "wagyu-bitlong-co"
+                    }
+                }
+            },
+            "block_order": [
+                "featured_collection_XNDNKP",
+                "featured_collection_cX6kPX",
+                "featured_collection_BMt3m7"
+            ],
+            "name": "t:sections.collection-list.presets.name",
+            "settings": {
+                "title": "Premium Snacks",
+                "heading_size": "h1",
+                "image_ratio": "square",
+                "columns_desktop": 3,
+                "enable_desktop_slider": false,
+                "color_scheme": "",
+                "show_view_all": false,
+                "columns_mobile": "1",
+                "swipe_on_mobile": false,
+                "padding_top": 36,
+                "padding_bottom": 36
+            }
+        },
+        "collection_list_MajfUd": {
+            "type": "collection-list",
+            "blocks": {
+                "featured_collection_9CGmej": {
+                    "type": "featured_collection",
+                    "settings": {
+                        "collection": "darrell-lea"
+                    }
+                },
+                "featured_collection_kKVWGw": {
+                    "type": "featured_collection",
+                    "settings": {
+                        "collection": "funday-natural-sweets"
+                    }
+                },
+                "featured_collection_A4TEEL": {
+                    "type": "featured_collection",
+                    "settings": {
+                        "collection": "zuum"
+                    }
+                }
+            },
+            "block_order": [
+                "featured_collection_9CGmej",
+                "featured_collection_kKVWGw",
+                "featured_collection_A4TEEL"
+            ],
+            "name": "t:sections.collection-list.presets.name",
+            "settings": {
+                "title": "Confectionery",
+                "heading_size": "h1",
+                "image_ratio": "square",
+                "columns_desktop": 3,
+                "enable_desktop_slider": false,
+                "color_scheme": "",
+                "show_view_all": false,
+                "columns_mobile": "1",
+                "swipe_on_mobile": false,
+                "padding_top": 36,
+                "padding_bottom": 36
+            }
+        },
+        "collection_list_DxAfNN": {
+            "type": "collection-list",
+            "blocks": {
+                "featured_collection_Tieg4A": {
+                    "type": "featured_collection",
+                    "settings": {
+                        "collection": "happy-inside"
+                    }
+                },
+                "featured_collection_NGgxej": {
+                    "type": "featured_collection",
+                    "settings": {
+                        "collection": "hullabaloos"
+                    }
+                },
+                "featured_collection_DdxWRw": {
+                    "type": "featured_collection",
+                    "settings": {
+                        "collection": "vie-drinks"
+                    }
+                }
+            },
+            "block_order": [
+                "featured_collection_Tieg4A",
+                "featured_collection_NGgxej",
+                "featured_collection_DdxWRw"
+            ],
+            "name": "t:sections.collection-list.presets.name",
+            "settings": {
+                "title": "Beverages",
+                "heading_size": "h1",
+                "image_ratio": "square",
+                "columns_desktop": 3,
+                "enable_desktop_slider": false,
+                "color_scheme": "",
+                "show_view_all": false,
+                "columns_mobile": "1",
+                "swipe_on_mobile": false,
+                "padding_top": 36,
+                "padding_bottom": 36
+            }
+        }
+    },
+    "order": [
+        "main",
+        "rich_text_7tpGVN",
+        "collection_list_VQmn8J",
+        "collection_list_MajfUd",
+        "collection_list_DxAfNN"
+    ]
+}
