@@ -12,17 +12,36 @@
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
   }
+
+  .account__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+  }
 {%- endstyle -%}
 
 <div class="customer account section-{{ section.id }}-padding">
+  {%- liquid
+    assign wholesale_page = pages['wholesale-registration']
+    if wholesale_page != blank
+      assign wholesale_url = wholesale_page.url
+    else
+      assign wholesale_url = routes.root_url | append: 'pages/wholesale-registration'
+    endif
+  -%}
   <div>
     <h1 class="customer__title">{{ 'customer.account.title' | t }}</h1>
-    <a href="{{ routes.account_logout_url }}">
-      <span class="svg-wrapper">
-        {{- 'icon-account.svg' | inline_asset_content -}}
-      </span>
-      {{ 'customer.log_out' | t }}
-    </a>
+    <div class="account__actions">
+      <a href="{{ routes.account_logout_url }}">
+        <span class="svg-wrapper">
+          {{- 'icon-account.svg' | inline_asset_content -}}
+        </span>
+        {{ 'customer.log_out' | t }}
+      </a>
+      <a href="{{ wholesale_url }}">
+        {{ 'general.wholesale.apply' | t }}
+      </a>
+    </div>
   </div>
 
   <div>

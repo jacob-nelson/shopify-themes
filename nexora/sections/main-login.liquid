@@ -17,6 +17,14 @@
 {%- if section.settings.enable_shop_login_button == false -%}
   {%- assign hide_shop_login_button = true -%}
 {%- endif -%}
+{%- liquid
+  assign wholesale_page = pages['wholesale-registration']
+  if wholesale_page != blank
+    assign wholesale_url = wholesale_page.url
+  else
+    assign wholesale_url = routes.root_url | append: 'pages/wholesale-registration'
+  endif
+-%}
 
 <div class="customer login section-{{ section.id }}-padding">
   <h1 id="recover" tabindex="-1">
@@ -151,6 +159,9 @@
 
       <a href="{{ routes.account_register_url }}">
         {{ 'customer.login_page.create_account' | t }}
+      </a>
+      <a href="{{ wholesale_url }}">
+        {{ 'general.wholesale.apply' | t }}
       </a>
     {%- endform -%}
   </div>

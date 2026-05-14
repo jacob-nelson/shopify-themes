@@ -66,6 +66,9 @@
       "loading": "Loading your wishlist…",
       "empty": "Your wishlist is empty. Save items you love from product pages.",
       "product_image_alt": "[title]"
+    },
+    "wholesale": {
+      "apply": "Apply for wholesale"
     }
   },
   "newsletter": {

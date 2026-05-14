@@ -1,9 +1,19 @@
 (function () {
-  const STORAGE_KEY = 'nexora_wishlist_handles';
+  const STORAGE_KEY_BASE = 'nexora_wishlist_handles';
+
+  function wishlistStorageKey() {
+    const customerId =
+      window.nexoraCustomerId !== null && window.nexoraCustomerId !== undefined
+        ? String(window.nexoraCustomerId).trim()
+        : '';
+
+    if (customerId) return STORAGE_KEY_BASE + '_customer_' + customerId;
+    return STORAGE_KEY_BASE + '_guest';
+  }
 
   function readHandles() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = localStorage.getItem(wishlistStorageKey());
       if (!raw) return [];
       const data = JSON.parse(raw);
       if (!Array.isArray(data)) return [];
@@ -20,7 +30,7 @@
     handles.forEach(function (h) {
       if (uniq.indexOf(h) === -1) uniq.push(h);
     });
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(uniq));
+    localStorage.setItem(wishlistStorageKey(), JSON.stringify(uniq));
     updateWishlistUi();
     document.dispatchEvent(new CustomEvent('wishlist:updated', { detail: { count: uniq.length } }));
   }

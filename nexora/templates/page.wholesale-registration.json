@@ -1,0 +1,18 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-wholesale-registration",
+      "settings": {
+        "heading": "Apply for wholesale",
+        "subheading": "<p>Complete this form to request a wholesale account. We review applications within 1-2 business days.</p>",
+        "submit_label": "Submit application",
+        "success_message": "Thanks. Your wholesale application has been submitted.",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

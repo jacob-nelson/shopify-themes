@@ -64,6 +64,13 @@
     line-height: calc(1 + 0.8 / var(--font-body-scale));
   }
 
+  .header__wholesale-link {
+    font-size: 1.4rem;
+    margin-right: 1rem;
+    text-underline-offset: 0.2rem;
+    white-space: nowrap;
+  }
+
   @media screen and (min-width: 750px) {
     .list-menu__item--link {
       padding-bottom: 0.5rem;
@@ -233,6 +240,17 @@
         {%- endif -%}
       </div>
       {% render 'header-search', input_id: 'Search-In-Modal' %}
+      {%- liquid
+        assign wholesale_page = pages['wholesale-registration']
+        if wholesale_page != blank
+          assign wholesale_url = wholesale_page.url
+        else
+          assign wholesale_url = routes.root_url | append: 'pages/wholesale-registration'
+        endif
+      -%}
+      <a href="{{ wholesale_url }}" class="header__wholesale-link link small-hide medium-hide">
+        {{ 'general.wholesale.apply' | t }}
+      </a>
 
       {%- if shop.customer_accounts_enabled -%}
         <a

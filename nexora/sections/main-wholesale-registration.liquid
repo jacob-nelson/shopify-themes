@@ -1,0 +1,429 @@
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<section class="wholesale-registration section-{{ section.id }}-padding">
+  <div class="page-width page-width--narrow">
+    <h1 class="page-title h0">
+      {{ section.settings.heading | escape }}
+    </h1>
+    {%- if section.settings.subheading != blank -%}
+      <div class="rte wholesale-registration__intro">
+        {{ section.settings.subheading }}
+      </div>
+    {%- endif -%}
+
+    {% form 'contact', class: 'wholesale-registration__form' %}
+      {%- if form.posted_successfully? -%}
+        <div class="form-status form-status-list form__message" tabindex="-1" autofocus>
+          <span class="svg-wrapper">{{- 'icon-success.svg' | inline_asset_content -}}</span>
+          {{ section.settings.success_message | escape }}
+        </div>
+      {%- elsif form.errors -%}
+        <div class="form__message">
+          <span class="svg-wrapper">{{- 'icon-error.svg' | inline_asset_content -}}</span>
+          {{ form.errors | default_errors }}
+        </div>
+      {%- endif -%}
+
+      <input type="hidden" name="contact[application_type]" value="wholesale">
+      <input type="hidden" name="contact[source_page]" value="{{ request.path }}">
+      <input type="hidden" name="contact[submitted_at]" value="{{ 'now' | date: '%Y-%m-%d %H:%M:%S %z' }}">
+
+      <fieldset class="wholesale-registration__fieldset">
+        <legend>Business information</legend>
+        <div class="field wholesale-registration__field">
+          <input type="text" name="contact[company_legal_name]" id="WholesaleCompanyLegalName" required>
+          <label for="WholesaleCompanyLegalName">Legal company name</label>
+        </div>
+        <div class="field wholesale-registration__field">
+          <input type="text" name="contact[trading_name]" id="WholesaleTradingName">
+          <label for="WholesaleTradingName">Trading name / DBA</label>
+        </div>
+        <div class="field wholesale-registration__field">
+          <label class="select__label" for="WholesaleBusinessType">Business type</label>
+          <div class="select">
+            <select id="WholesaleBusinessType" name="contact[business_type]" required>
+              <option value="">Select</option>
+              <option value="distributor">Distributor</option>
+              <option value="restaurant">Restaurant</option>
+              <option value="cafe">Cafe</option>
+              <option value="hotel">Hotel</option>
+              <option value="retailer">Retailer</option>
+              <option value="other">Other</option>
+            </select>
+            <span class="svg-wrapper">
+              {{- 'icon-caret.svg' | inline_asset_content -}}
+            </span>
+          </div>
+        </div>
+        <div class="field wholesale-registration__field">
+          <input type="text" name="contact[tax_id_vat_trn]" id="WholesaleTaxId" required>
+          <label for="WholesaleTaxId">Tax registration number / VAT / TRN</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="wholesale-registration__fieldset">
+        <legend>Primary buyer contact</legend>
+        <div class="field wholesale-registration__field">
+          <input type="text" name="contact[first_name]" id="WholesaleFirstName" required>
+          <label for="WholesaleFirstName">First name</label>
+        </div>
+        <div class="field wholesale-registration__field">
+          <input type="text" name="contact[last_name]" id="WholesaleLastName" required>
+          <label for="WholesaleLastName">Last name</label>
+        </div>
+        <div class="field wholesale-registration__field">
+          <input type="email" name="contact[email]" id="WholesaleEmail" autocorrect="off" autocapitalize="off" required>
+          <label for="WholesaleEmail">Work email</label>
+        </div>
+        <div class="field wholesale-registration__field">
+          <input type="tel" name="contact[phone]" id="WholesalePhone" required>
+          <label for="WholesalePhone">Mobile number</label>
+        </div>
+        <div class="field wholesale-registration__field">
+          <input type="text" name="contact[job_role]" id="WholesaleRole" required>
+          <label for="WholesaleRole">Job title / role</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="wholesale-registration__fieldset">
+        <legend>Purchasing profile</legend>
+        <div class="field wholesale-registration__field">
+          <label class="select__label" for="WholesaleExpectedMonthlyValue">Expected monthly order value</label>
+          <div class="select">
+            <select id="WholesaleExpectedMonthlyValue" name="contact[expected_monthly_order_value]" required>
+              <option value="">Select</option>
+              <option value="under_1000">Under AED 1,000</option>
+              <option value="1000_5000">AED 1,000 - AED 5,000</option>
+              <option value="5000_25000">AED 5,000 - AED 25,000</option>
+              <option value="25000_plus">AED 25,000+</option>
+            </select>
+            <span class="svg-wrapper">
+              {{- 'icon-caret.svg' | inline_asset_content -}}
+            </span>
+          </div>
+        </div>
+        <div class="field wholesale-registration__field">
+          <label class="select__label" for="WholesaleOrderFrequency">Typical order frequency</label>
+          <div class="select">
+            <select id="WholesaleOrderFrequency" name="contact[order_frequency]" required>
+              <option value="">Select</option>
+              <option value="weekly">Weekly</option>
+              <option value="biweekly">Bi-weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+            <span class="svg-wrapper">
+              {{- 'icon-caret.svg' | inline_asset_content -}}
+            </span>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="wholesale-registration__fieldset">
+        <legend>Address and logistics</legend>
+        <div class="field wholesale-registration__field">
+          <input type="text" name="contact[billing_address_1]" id="WholesaleBillingAddress1" required>
+          <label for="WholesaleBillingAddress1">Billing address line 1</label>
+        </div>
+        <div class="field wholesale-registration__field">
+          <input type="text" name="contact[billing_city]" id="WholesaleBillingCity" required>
+          <label for="WholesaleBillingCity">City</label>
+        </div>
+        <div class="field wholesale-registration__field">
+          <input type="text" name="contact[billing_state]" id="WholesaleBillingState" required>
+          <label for="WholesaleBillingState">Emirate / State</label>
+        </div>
+        <div class="field wholesale-registration__field">
+          <input type="text" name="contact[billing_postal_code]" id="WholesaleBillingPostalCode">
+          <label for="WholesaleBillingPostalCode">Postal code</label>
+        </div>
+      </fieldset>
+
+      <fieldset class="wholesale-registration__fieldset">
+        <legend>Compliance and consent</legend>
+        <div class="field wholesale-registration__field">
+          <input type="text" name="contact[trade_license_number]" id="WholesaleTradeLicenseNumber" required>
+          <label for="WholesaleTradeLicenseNumber">Trade license number</label>
+        </div>
+        <div class="field wholesale-registration__field">
+          <input type="date" name="contact[trade_license_expiry]" id="WholesaleTradeLicenseExpiry" required>
+          <label for="WholesaleTradeLicenseExpiry">Trade license expiry date</label>
+        </div>
+
+        <label class="wholesale-registration__checkbox">
+          <input type="checkbox" name="contact[accept_wholesale_terms]" value="yes" required>
+          <span>I accept wholesale terms and pricing policies</span>
+        </label>
+        <label class="wholesale-registration__checkbox">
+          <input type="checkbox" name="contact[accept_privacy_policy]" value="yes" required>
+          <span>I accept the privacy policy</span>
+        </label>
+        <label class="wholesale-registration__checkbox">
+          <input type="checkbox" name="contact[marketing_opt_in]" value="yes">
+          <span>Send me updates and offers</span>
+        </label>
+      </fieldset>
+
+      <div class="field wholesale-registration__honeypot" aria-hidden="true">
+        <input type="text" name="contact[website_url]" id="WholesaleWebsiteUrl" tabindex="-1" autocomplete="off">
+        <label for="WholesaleWebsiteUrl">Website</label>
+      </div>
+
+      <button type="submit" class="button wholesale-registration__submit">
+        {{ section.settings.submit_label | escape }}
+      </button>
+    {% endform %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .wholesale-registration .page-width {
+    max-width: 84rem;
+  }
+
+  .wholesale-registration .page-title {
+    margin-bottom: 1.2rem;
+  }
+
+  .wholesale-registration__intro {
+    margin-bottom: 2.8rem;
+    color: rgba(var(--color-foreground), 0.72);
+    line-height: 1.6;
+  }
+
+  .wholesale-registration__form {
+    display: grid;
+    gap: 2.4rem;
+    padding: 2.2rem;
+    border: 0.1rem solid rgba(var(--color-foreground), 0.1);
+    border-radius: 2rem;
+    background: rgb(var(--color-background));
+    box-shadow: 0 1.6rem 4rem rgba(var(--color-foreground), 0.06);
+  }
+
+  .wholesale-registration .form__message,
+  .wholesale-registration .form-status {
+    margin: 0;
+    border-radius: 1.2rem;
+  }
+
+  .wholesale-registration__fieldset {
+    border: 0.1rem solid rgba(var(--color-foreground), 0.08);
+    border-radius: 1.4rem;
+    padding: 2rem 1.8rem;
+    margin: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.4rem;
+    background: rgba(var(--color-background), 0.96);
+  }
+
+  .wholesale-registration__fieldset legend {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.02rem;
+    padding: 0 0.8rem;
+  }
+
+  .wholesale-registration .field {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .wholesale-registration .field.wholesale-registration__field::after,
+  .wholesale-registration .field.wholesale-registration__field:hover.field::after {
+    box-shadow: none !important;
+    transition: none !important;
+  }
+
+  .wholesale-registration .field input,
+  .wholesale-registration .field select {
+    position: static;
+    height: 4.8rem;
+    padding: 0 1.4rem;
+    border: 0;
+    border-radius: 1rem;
+    background: rgb(var(--color-background));
+    font-size: 1.4rem;
+    line-height: 1.4;
+    box-shadow: inset 0 0 0 .2rem rgba(var(--color-foreground),.1);
+  }
+
+  .wholesale-registration .field label,
+  .wholesale-registration .field .select__label {
+    position: static;
+    transform: none;
+    color: rgba(var(--color-foreground), 0.72);
+    font-size: 1.3rem;
+    line-height: 1.35;
+    margin: 0;
+    order: -1;
+  }
+
+  .wholesale-registration .select {
+    margin: 0;
+  }
+
+  .wholesale-registration .select:before,
+  .wholesale-registration .select:after {
+    display: none;
+  }
+
+  .wholesale-registration .select .select__select {
+    padding-right: 4rem;
+    border: 0;
+    box-shadow: inset 0 0 0 0.1rem rgba(var(--color-foreground), 0.06);
+    border-radius: 1rem;
+    background-color: rgb(var(--color-background));
+  }
+
+  .wholesale-registration .select .svg-wrapper {
+    right: 1.2rem;
+    pointer-events: none;
+  }
+
+  .wholesale-registration .field input:focus,
+  .wholesale-registration .field select:focus {
+    box-shadow: inset 0 0 0 0.1rem rgba(var(--color-foreground), 0.12), 0 0 0 0.2rem rgba(var(--color-foreground), 0.08);
+    outline: 0;
+  }
+
+  .wholesale-registration .field input[type='date'] {
+    min-height: 4.8rem;
+  }
+
+  .wholesale-registration__checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    font-size: 1.4rem;
+    line-height: 1.5;
+    color: rgba(var(--color-foreground), 0.84);
+  }
+
+  .wholesale-registration__checkbox input {
+    margin-top: 0.25rem;
+    width: 1.7rem;
+    height: 1.7rem;
+    accent-color: rgb(var(--color-foreground));
+    flex-shrink: 0;
+  }
+
+  .wholesale-registration__submit {
+    width: 100%;
+    min-height: 5.2rem;
+    border-radius: 1.2rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  @media screen and (min-width: 750px) {
+    .wholesale-registration__form {
+      padding: 3rem;
+    }
+
+    .wholesale-registration__fieldset {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 1.6rem;
+      row-gap: 1.4rem;
+    }
+
+    .wholesale-registration__fieldset legend {
+      margin-bottom: 0.4rem;
+    }
+
+    .wholesale-registration__fieldset .wholesale-registration__checkbox {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .wholesale-registration__honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  document.addEventListener('submit', function (event) {
+    var form = event.target.closest('.wholesale-registration__form');
+    if (!form) return;
+    var honeypot = form.querySelector('#WholesaleWebsiteUrl');
+    if (honeypot && honeypot.value.trim().length > 0) {
+      event.preventDefault();
+    }
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Wholesale registration",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Apply for wholesale"
+    },
+    {
+      "type": "richtext",
+      "id": "subheading",
+      "label": "Intro text",
+      "default": "<p>Complete this form and our team will review your wholesale application within 1-2 business days.</p>"
+    },
+    {
+      "type": "text",
+      "id": "submit_label",
+      "label": "Submit label",
+      "default": "Submit application"
+    },
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success message",
+      "default": "Thanks. Your wholesale application has been submitted."
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 36
+    }
+  ]
+}
+{% endschema %}
