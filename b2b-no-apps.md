@@ -359,6 +359,381 @@ This SOP is for a no-app team process and can run entirely from Shopify admin + 
 - Approved: `Your wholesale account is approved - activate your account`
 - Rejected: `Update on your wholesale account application`
 
+## Pack Quantity, Pricing, Inventory, and Returns (B2B)
+
+Requirement: for B2B, quantity `1` means a pack of `n` pieces, and shown price should be `unit_price x n`.
+
+### Recommended No-App Model (Operationally Safe)
+
+Use **separate B2B pack variants/SKUs** for each wholesale product:
+- Retail SKU sells per piece.
+- B2B SKU sells per pack (for example pack of 6, pack of 12).
+- Catalog assigns B2B prices on pack SKUs only.
+
+This keeps Shopify-native inventory behavior predictable without custom code.
+
+### Pricing Display Rules
+
+- Store pack size in variant metafield (for example `custom.pack_size`).
+- Compute and display messaging on PDP/PLP for B2B users:
+  - `Pack of n`
+  - `Price per pack = unit_price x n` (display formula text or computed value).
+- Checkout line price remains variant price (pack price), which avoids mismatch with order totals.
+
+### Inventory Rules
+
+- For B2B pack SKU, Shopify decrements **1 pack unit** when quantity 1 is ordered.
+- To align with piece-level planning, operations should maintain conversion:
+  - `available_pieces = pack_inventory x pack_size`.
+- If a single shared piece pool is mandatory across retail + B2B in real time, that requires custom automation/app logic beyond no-app scope.
+
+### Returns Rules
+
+- Return quantity for B2B pack SKU is in pack units.
+- When 1 pack is returned, inventory adds back 1 pack unit.
+- Operational reporting can convert to pieces via `returned_pieces = returned_packs x pack_size`.
+
+### Theme / UX Requirements for Packs
+
+- Show pack badge for B2B variants (`Pack of n`).
+- Show per-piece equivalent below price for clarity:
+  - `Equivalent per piece: pack_price / n`.
+- Update cart line labels to include pack size to prevent buyer confusion.
+
+### Data Model Additions
+
+Per B2B variant (metafields):
+- `custom.pack_size` (integer, required for B2B pack products)
+- `custom.base_unit` (string, e.g., `piece`)
+- `custom.b2b_pack_sku` (optional cross-reference)
+
+### Validation and UAT for Pack Logic
+
+- B2B account sees only pack variants/prices where intended.
+- Adding qty 1 in B2B cart reflects one pack price.
+- Inventory decrement on order equals 1 pack unit.
+- Return of qty 1 restores 1 pack unit.
+- Storefront messaging consistently shows pack size and per-piece equivalent.
+
+### Escalation Trigger (When No-App Is Not Enough)
+
+Move to custom app/workflow if you need:
+- automatic real-time conversion against one shared piece inventory pool,
+- reservation logic across retail piece SKUs and B2B pack SKUs,
+- automatic back-calculation of pack inventory from piece inventory without manual operations.
+
+## Theme Display Logic Spec (B2B Pack Products)
+
+Goal: make B2B pricing unambiguous when quantity `1` means one pack of `n` pieces.
+
+### Required Product/Variant Data
+
+- Variant price = **pack price** (what checkout charges).
+- Variant metafield `custom.pack_size` = integer `n` (required for B2B pack variants).
+- Optional variant metafield `custom.base_unit_price` = piece price (for display transparency).
+- Optional product metafield `custom.is_b2b_pack_product` = boolean (for easy theme conditions).
+
+### Context Detection Rules
+
+Render pack UI only when all are true:
+- customer is logged in,
+- customer is an approved wholesale/B2B customer (tag/metafield or company context),
+- selected variant has valid `custom.pack_size >= 2`.
+
+Otherwise render normal retail pricing UI.
+
+### Product Listing Page (PLP) Rules
+
+For each B2B pack product card:
+- Primary price text: `AED {pack_price}`.
+- Secondary line: `per pack of {n}`.
+- Tertiary line (optional): `AED {pack_price / n} per piece`.
+- Badge: `Wholesale Pack`.
+
+For retail/non-B2B users:
+- hide pack-specific labels.
+
+### Product Detail Page (PDP) Rules
+
+For B2B pack variant selection:
+- Main price = pack price (`AED {pack_price}`).
+- Show helper text:
+  - `1 qty = 1 pack ({n} pieces)`
+  - `Equivalent per piece: AED {pack_price / n}`
+- If base unit price metafield exists, show:
+  - `Pack price = AED {base_unit_price} x {n} = AED {pack_price}`
+- Quantity input label:
+  - from `Quantity` to `Packs`.
+
+Validation/fallback:
+- If `pack_size` missing/invalid, hide formula text and show `Pack pricing unavailable` fallback note for staff QA environments only (not customer-facing in production).
+
+### Cart Rules
+
+For B2B cart line item:
+- Show line title suffix: `(Pack of {n})`.
+- Quantity column header = `Packs`.
+- Line total formula text:
+  - `AED {pack_price} x {qty_packs} packs = AED {line_total}`.
+- Optional informational subline:
+  - `Total pieces: {qty_packs x n}`.
+
+For retail cart:
+- keep standard labels and behavior.
+
+### Mini-Cart / Drawer Rules
+
+- Mirror PDP/cart language:
+  - `Pack of {n}`
+  - `Qty (packs): {qty}`
+- Avoid mixed wording (`units`, `pieces`) in B2B context unless explicitly showing equivalent pieces.
+
+### Checkout Messaging
+
+- Do not alter checkout calculations.
+- Ensure product/variant titles include pack clarity where possible (e.g., variant option value `Pack of 12`) so order and invoice remain clear.
+
+### Translation/Copy Standards
+
+Use consistent strings:
+- `Pack of {n}`
+- `1 qty = 1 pack`
+- `Equivalent per piece`
+- `Total pieces`
+
+Avoid ambiguous words:
+- `unit`, `item`, `qty` without context in B2B screens.
+
+### QA Scenarios for Theme Logic
+
+1. **Retail user** opens same product:
+   - sees retail price only, no pack messaging.
+2. **Approved B2B user** opens pack product:
+   - sees pack price + pack size + per-piece equivalent.
+3. B2B user adds qty 3:
+   - cart shows 3 packs and correct line total.
+4. Switch variants (pack 6 to pack 12):
+   - pack labels and equivalent per-piece value update correctly.
+5. Variant missing `pack_size`:
+   - safe fallback behavior triggers; no broken UI text.
+
+### Implementation Notes for Theme Team
+
+- Centralize calculations in one reusable snippet/helper to avoid price-text drift between PLP, PDP, and cart.
+- Round per-piece equivalent to store currency precision (typically 2 decimals).
+- Keep all pack-related copy in locale files for easy translation updates.
+
+## Developer Handoff Checklist (By File Area)
+
+Use this as an execution checklist for the theme developer.
+
+### 1) Product Card / Collection Grid
+
+- Identify product-card render files/snippets in theme.
+- Add B2B context guard (approved wholesale customer only).
+- Add pack labels under card price:
+  - `per pack of {n}`
+  - optional `per piece` equivalent.
+- Ensure retail users never see pack labels.
+- Validate currency formatting consistency with existing theme helpers.
+
+### 2) Product Detail Page (PDP)
+
+- Identify main product template/section and variant price block.
+- Read selected variant `custom.pack_size`.
+- In B2B context:
+  - rename quantity label to `Packs`,
+  - show `1 qty = 1 pack ({n} pieces)`,
+  - show per-piece equivalent and optional formula text.
+- Ensure variant switching updates pack labels live.
+- Add safe fallback for missing/invalid pack metafield.
+
+### 3) Cart Page
+
+- Identify cart line-item template/snippet.
+- In B2B context for pack variants:
+  - append `(Pack of {n})` near line title,
+  - change quantity header/label to `Packs`,
+  - show line math (`pack_price x packs`),
+  - optionally show `Total pieces`.
+- Keep retail cart unchanged.
+
+### 4) Cart Drawer / Mini Cart
+
+- Mirror cart page language and formulas.
+- Verify no conflicting text like `items` for B2B pack lines.
+
+### 5) Locale / Translation Files
+
+- Add keys for all new strings:
+  - `pack_of`
+  - `qty_equals_pack`
+  - `equivalent_per_piece`
+  - `total_pieces`
+  - `packs_label`
+  - `wholesale_pack_badge`
+- Replace hardcoded strings in templates with locale keys.
+
+### 6) Customer Context Utility
+
+- Add one shared helper/snippet for wholesale-context detection (tag/metafield/company logic).
+- Reuse this helper across PLP, PDP, cart, and drawer.
+- Add a single source of truth for `isWholesaleCustomer`.
+
+### 7) Pack Calculation Utility
+
+- Add one reusable helper/snippet to:
+  - read/validate `pack_size`,
+  - compute per-piece equivalent,
+  - compute total pieces in cart context.
+- Apply consistent rounding and formatting across all surfaces.
+
+### 8) Catalog and Product Data Prep (Admin)
+
+- Ensure B2B pack variants exist and have correct prices.
+- Populate `custom.pack_size` on all B2B variants.
+- Ensure approved B2B customers are mapped to the intended wholesale catalog.
+
+### 9) QA Checklist (Dev + Merchant)
+
+- Retail login and guest views show no wholesale pack messaging.
+- Approved B2B user sees pack messaging consistently on PLP/PDP/cart/drawer.
+- Changing variants updates pack size and per-piece equivalent correctly.
+- Cart totals match checkout totals with no display mismatch.
+- Return/order admin records clearly identify pack variants.
+
+### 10) Go-Live Checklist
+
+- Theme preview tested with one retail and one approved B2B account.
+- Content/support team trained on new pack wording.
+- Rollback plan ready (toggle/branch to disable pack UI messaging quickly if needed).
+
+## Day-Wise Execution Schedule (3 Days)
+
+### Day 1: Admin and Data Foundation
+
+**Owner:** Shopify admin ops + merchandising
+
+- Create/verify `Wholesale Catalog` pricing and included products.
+- Prepare B2B pack variants/SKUs for target products.
+- Populate variant metafields (`custom.pack_size`, optional `custom.base_unit_price`).
+- Prepare customer tags/status model for wholesale applications.
+- Create saved admin views for `applied`, `in_review`, `approved`, `rejected`.
+- Finalize SOP templates (approval, rejection, more-info emails).
+
+**End-of-day output:**
+- Catalog and pack data are ready for theme integration.
+- One internal test B2B customer prepared for QA tomorrow.
+
+### Day 2: Theme and UX Implementation
+
+**Owner:** Theme developer
+
+- Implement wholesale context helper.
+- Implement pack calculation helper (pack size + per-piece equivalent).
+- Update PLP product cards with pack labels in B2B context.
+- Update PDP with:
+  - `Packs` quantity label,
+  - `1 qty = 1 pack ({n} pieces)` messaging,
+  - per-piece equivalent.
+- Update cart and mini-cart with pack-aware line labels and totals text.
+- Add/verify all locale keys for pack messaging.
+
+**End-of-day output:**
+- Complete theme implementation in preview.
+- Self-test pass for retail and B2B basic journeys.
+
+### Day 3: QA, UAT, and Go-Live
+
+**Owner:** QA + merchant operations + support
+
+- Run full QA matrix:
+  - retail visibility and pricing,
+  - B2B visibility and pricing,
+  - variant switching behavior,
+  - cart/checkout consistency,
+  - order and return behavior in admin.
+- Execute UAT with real stakeholder accounts (at least one retail and one approved B2B).
+- Validate approval SOP with one sandbox application end-to-end.
+- Train support team on customer communication playbook.
+- Go live during low-traffic window with rollback readiness.
+
+**End-of-day output:**
+- Signed UAT checklist.
+- Controlled production launch completed.
+
+## Post-Go-Live (First 7 Days)
+
+**Owner:** Ops + support + analytics
+
+- Monitor:
+  - wholesale application volume,
+  - approval turnaround SLA,
+  - pricing/inventory support tickets,
+  - return handling accuracy for pack variants.
+- Run a daily 15-minute review to catch mispriced or mis-tagged products quickly.
+- Capture improvement backlog for Phase 2 (automation/custom app if needed).
+
+## Stakeholder One-Page Summary (Client Sign-Off)
+
+### Objective
+
+Foodlink UAE will run one Shopify storefront where:
+- retail buyers see retail products/prices,
+- approved wholesale buyers see B2B catalog/pricing,
+- wholesale buyers can apply through a dedicated registration page.
+
+### What Will Be Delivered
+
+- A new wholesale registration page for B2B applications.
+- A manual review and approval process in Shopify admin.
+- Company and customer linking for approved wholesale accounts.
+- Direct mapping of wholesale catalog to approved company/company location.
+- Pack-based B2B buying experience where quantity `1` means one pack.
+
+### How Pack Pricing Works
+
+- Retail continues to buy per piece.
+- B2B buys pack variants (for example pack of 6 or 12).
+- B2B displayed and charged price is per pack.
+- Inventory and returns are handled in pack units for B2B variants.
+
+### What This Approach Avoids
+
+- No third-party wholesale app dependency.
+- No custom backend required in phase 1.
+- No major checkout customization risk.
+
+### Business Benefits
+
+- Faster go-live and lower implementation cost.
+- Clear separation between retail and wholesale experiences.
+- Better pricing control through native Shopify catalogs.
+- Operationally manageable process for approvals and support teams.
+
+### Known Limits (Phase 1)
+
+- Approval workflow is partly manual.
+- Document verification and audit trail are basic.
+- Shared piece-level real-time inventory conversion across retail and B2B is not included.
+
+### Timeline
+
+- Day 1: catalog/data/admin setup
+- Day 2: theme and pack UX implementation
+- Day 3: QA, UAT, and controlled go-live
+
+### Success Criteria
+
+- Retail users never see wholesale pricing/products.
+- Approved wholesale users see correct pack pricing.
+- B2B orders and returns adjust pack inventory correctly.
+- Approval SLA is met and support team can operate process confidently.
+
+### Sign-Off Decision
+
+Approve this phase-1 no-app rollout to launch quickly, then evaluate phase-2 automation after 2-4 weeks of live operations and data.
+
 ## Validation Checklist
 
 - Retail visitor never sees wholesale-only products/prices.
