@@ -1,0 +1,28 @@
+{% comment %}
+  Computes pack-related values from a variant for B2B messaging.
+
+  Accepts:
+  - variant: {Object} required product variant
+  - quantity: {Number} optional quantity, defaults to 1
+
+  Outputs pipe-delimited values:
+  - is_valid_pack|pack_size|per_piece_price_formatted|total_pieces
+{% endcomment %}
+{%- liquid
+  assign pack_variant = variant
+  assign qty = quantity | default: 1 | plus: 0
+  assign pack_size = pack_variant.metafields.custom.pack_size.value | default: 0 | plus: 0
+
+  if pack_size >= 2
+    assign per_piece_price = pack_variant.price | divided_by: pack_size | money_with_currency
+    assign total_pieces = qty | times: pack_size
+    echo 'true|'
+    echo pack_size
+    echo '|'
+    echo per_piece_price
+    echo '|'
+    echo total_pieces
+  else
+    echo 'false|0||0'
+  endif
+-%}

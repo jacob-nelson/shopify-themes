@@ -133,6 +133,17 @@
                     {%- endif -%}
                   </div>
                 {%- endif -%}
+                {%- assign current_variant_weight = product.selected_or_first_available_variant.weight | default: 0 -%}
+                <div
+                  id="Weight-{{ section.id }}"
+                  class="product__tax caption rte{% if current_variant_weight <= 0 %} hidden{% endif %}"
+                  role="status"
+                >
+                  {%- if current_variant_weight > 0 -%}
+                    {{ 'products.product.b2b.weight_label' | t }}:
+                    {{- product.selected_or_first_available_variant.weight | weight_with_unit -}}
+                  {%- endif -%}
+                </div>
                 <div {{ block.shopify_attributes }}>
                   {%- assign product_form_installment_id = 'product-form-installment-' | append: section.id -%}
                   {%- form 'product', product, id: product_form_installment_id, class: 'installment caption-large' -%}
@@ -245,28 +256,36 @@
                       variant: product.selected_or_first_available_variant
                     -%}
                   {%- endcapture -%}
+                  {%- capture pack_values_capture -%}
+                    {%- render 'b2b-pack-values', variant: product.selected_or_first_available_variant, quantity: 1 -%}
+                  {%- endcapture -%}
                   {%- liquid
+                    assign pack_values = pack_values_capture | strip | split: '|'
+                    assign has_valid_pack = false
+                    if pack_values[0] == 'true'
+                      assign has_valid_pack = true
+                    endif
+                    assign product_pack_size = pack_values[1] | plus: 0
+                    assign product_piece_weight = ''
+                    if product.selected_or_first_available_variant.weight and product.selected_or_first_available_variant.weight > 0
+                      assign product_piece_weight = product.selected_or_first_available_variant.weight | weight_with_unit
+                    endif
                     assign product_page_moq = product_moq_capture | strip | plus: 0
                     assign product_qty_min = product_page_moq
                     if product.selected_or_first_available_variant.quantity_rule.min > product_qty_min
                       assign product_qty_min = product.selected_or_first_available_variant.quantity_rule.min
                     endif
-                    assign product_b2b_case_size = product.metafields.custom.case_size.value | default: 0 | plus: 0
                     assign product_qty_step = product.selected_or_first_available_variant.quantity_rule.increment
-                    if customer and customer.b2b? and product_b2b_case_size > 1
-                      if product_b2b_case_size > product_qty_step
-                        assign product_qty_step = product_b2b_case_size
-                      endif
-                      if product_b2b_case_size > product_qty_min
-                        assign product_qty_min = product_b2b_case_size
-                      endif
-                    endif
                   -%}
                   <span class="visually-hidden" id="quantity-label-{{ section.id }}">
                     {%- if cart_qty > 0 -%}
                       {{- 'products.product.quantity.in_cart_aria_label' | t: quantity: cart_qty -}}
                     {%- else -%}
-                      {{- 'products.product.quantity.label' | t -}}
+                      {%- if has_valid_pack -%}
+                        {{- 'products.product.b2b.packs_label' | t -}}
+                      {%- else -%}
+                        {{- 'products.product.quantity.label' | t -}}
+                      {%- endif -%}
                     {%- endif -%}
                   </span>
                   <label
@@ -274,7 +293,13 @@
                     for="Quantity-{{ section.id }}"
                     aria-labelledby="quantity-label-{{ section.id }}"
                   >
-                    <span aria-hidden="true">{{ 'products.product.quantity.label' | t }}</span>
+                    <span aria-hidden="true">
+                      {%- if has_valid_pack -%}
+                        {{ 'products.product.b2b.packs_label' | t }}
+                      {%- else -%}
+                        {{ 'products.product.quantity.label' | t }}
+                      {%- endif -%}
+                    </span>
                     <span class="quantity__rules-cart{% if cart_qty == 0 %} hidden{% endif %}" aria-hidden="true">
                       {%- render 'loading-spinner' -%}
                       <span
@@ -413,6 +438,21 @@
                     <div class="product-form__moq-note caption"></div>
                   {%- endif -%}
                   <div class="quantity__rules caption" id="Quantity-Rules-{{ section.id }}">
+                    {%- if has_valid_pack -%}
+                      <span class="divider">
+                        {%- if product_piece_weight != blank -%}
+                          {{
+                            'products.product.b2b.qty_equals_pack_with_weight'
+                            | t: piece_weight: product_piece_weight, n: product_pack_size
+                          }}
+                        {%- else -%}
+                          {{ 'products.product.b2b.qty_equals_pack' | t: n: product_pack_size }}
+                        {%- endif -%}
+                      </span>
+                      <div class="caption">
+                        {{ 'products.product.b2b.equivalent_per_piece' | t }}: {{ pack_values[2] }}
+                      </div>
+                    {%- endif -%}
                     {%- if product_qty_step > 1 -%}
                       <span class="divider">
                         {{-

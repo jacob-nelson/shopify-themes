@@ -22,6 +22,14 @@
   id="main-cart-footer"
   data-id="{{ section.id }}"
 >
+  {%- assign has_pack_items = false -%}
+  {%- for item in cart.items -%}
+    {%- assign item_pack_size = item.variant.metafields.custom.pack_size.value | default: 0 | plus: 0 -%}
+    {%- if item_pack_size >= 2 -%}
+      {%- assign has_pack_items = true -%}
+      {%- break -%}
+    {%- endif -%}
+  {%- endfor -%}
   <div class="page-width">
     <div class="cart__footer isolate section-{{ section.id }}-padding">
       {%- if settings.show_cart_note -%}
@@ -62,6 +70,11 @@
                   <h2 class="totals__total">{{ 'sections.cart.estimated_total' | t }}</h2>
                   <p class="totals__total-value">{{ cart.total_price | money_with_currency }}</p>
                 </div>
+                {%- if has_pack_items -%}
+                  <p class="caption-large">
+                    {{ 'products.product.b2b.cart_totals_hint' | t }}
+                  </p>
+                {%- endif -%}
 
                 <small class="tax-note caption-large rte">
                   {%- if cart.duties_included and cart.taxes_included -%}

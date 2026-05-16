@@ -39,6 +39,16 @@
     if ratio == 0 or ratio == null
       assign ratio = 1
     endif
+
+    assign card_variant = card_product.selected_or_first_available_variant
+    capture card_pack_values_capture
+      render 'b2b-pack-values', variant: card_variant, quantity: 1
+    endcapture
+    assign card_pack_values = card_pack_values_capture | strip | split: '|'
+    assign card_has_pack_messaging = false
+    if card_pack_values[0] == 'true'
+      assign card_has_pack_messaging = true
+    endif
   -%}
   <div class="card-wrapper product-card-wrapper underline-links-hover">
     <div

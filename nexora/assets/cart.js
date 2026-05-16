@@ -183,9 +183,11 @@ class CartItems extends HTMLElement {
           if (cartDrawerWrapper) cartDrawerWrapper.classList.toggle('is-empty', parsedState.item_count === 0);
 
           this.getSectionsToRender().forEach((section) => {
+            const sectionContainer = document.getElementById(section.id);
+            if (!sectionContainer) return;
             const elementToReplace =
-              document.getElementById(section.id).querySelector(section.selector) ||
-              document.getElementById(section.id);
+              sectionContainer.querySelector(section.selector) ||
+              sectionContainer;
             elementToReplace.innerHTML = this.getSectionInnerHTML(
               parsedState.sections[section.section],
               section.selector
@@ -245,7 +247,9 @@ class CartItems extends HTMLElement {
   }
 
   getSectionInnerHTML(html, selector) {
-    return new DOMParser().parseFromString(html, 'text/html').querySelector(selector).innerHTML;
+    const doc = new DOMParser().parseFromString(html || '', 'text/html');
+    const source = doc.querySelector(selector) || doc.querySelector('.shopify-section') || doc.body;
+    return source ? source.innerHTML : '';
   }
 
   enableLoading(line) {

@@ -87,7 +87,9 @@ document.querySelectorAll('[id^="Details-"] summary').forEach((summary) => {
 const trapFocusHandlers = {};
 
 function trapFocus(container, elementToFocus = container) {
+  if (!container) return;
   var elements = getFocusableElements(container);
+  if (elements.length === 0) return;
   var first = elements[0];
   var last = elements[elements.length - 1];
 
@@ -1273,7 +1275,9 @@ class BulkAdd extends HTMLElement {
   }
 
   getSectionInnerHTML(html, selector) {
-    return new DOMParser().parseFromString(html, 'text/html').querySelector(selector).innerHTML;
+    const doc = new DOMParser().parseFromString(html || '', 'text/html');
+    const source = doc.querySelector(selector) || doc.querySelector('.shopify-section') || doc.body;
+    return source ? source.innerHTML : '';
   }
 }
 

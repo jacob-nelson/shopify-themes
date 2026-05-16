@@ -1,0 +1,43 @@
+{% comment %}
+  Determines whether the current customer should see wholesale/B2B UI.
+
+  Accepts:
+  - customer_object: {Object} optional customer object. Defaults to global `customer`.
+
+  Outputs:
+  - "true" or "false"
+{% endcomment %}
+{%- liquid
+  assign wholesale_customer = customer_object | default: customer
+  assign is_wholesale_customer = false
+
+  if wholesale_customer
+    assign has_company_context = false
+    if wholesale_customer.b2b?
+      assign has_company_context = true
+    endif
+
+    assign has_approved_status = false
+    assign wholesale_status = wholesale_customer.metafields.custom.wholesale_status.value | default: '' | downcase
+    if wholesale_status == 'approved'
+      assign has_approved_status = true
+    endif
+
+    assign has_approved_tag = false
+    if wholesale_customer.tags contains 'wholesale_approved'
+      assign has_approved_tag = true
+    endif
+
+    if has_company_context
+      if has_approved_status or has_approved_tag
+        assign is_wholesale_customer = true
+      endif
+    endif
+  endif
+
+  if is_wholesale_customer
+    echo 'true'
+  else
+    echo 'false'
+  endif
+-%}

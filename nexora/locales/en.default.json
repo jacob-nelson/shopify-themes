@@ -166,6 +166,19 @@
         "price_at_each_html": "at {{ price }}/ea",
         "price_range": "{{ minimum }} - {{ maximum }}"
       },
+      "b2b": {
+        "pack_of": "Pack of {{ n }}",
+        "qty_equals_pack": "1 qty = 1 pack ({{ n }} pieces)",
+        "qty_equals_pack_with_weight": "1 qty = 1 pack ({{ piece_weight }} x {{ n }} pieces)",
+        "equivalent_per_piece": "Equivalent per piece",
+        "weight_label": "Weight",
+        "total_pieces": "Total pieces: {{ quantity }}",
+        "packs_label": "Packs",
+        "wholesale_pack_badge": "Wholesale pack",
+        "line_total_formula": "{{ pack_price }} x {{ qty }} packs = {{ line_total }}",
+        "packs_input_label": "Packs for {{ product }}",
+        "cart_totals_hint": "Cart totals are shown using pack pricing."
+      },
       "pickup_availability": {
         "view_store_info": "View store information",
         "check_other_stores": "Check availability at other stores",

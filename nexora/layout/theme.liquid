@@ -300,7 +300,15 @@
     </script>
   </head>
 
-  <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}{% if customer and customer.b2b? %} b2b-customer{% endif %}">
+  {%- capture wholesale_context_capture -%}
+    {%- render 'wholesale-context' -%}
+  {%- endcapture -%}
+  {%- assign wholesale_context_value = wholesale_context_capture | strip -%}
+  {%- assign is_wholesale_customer = false -%}
+  {%- if wholesale_context_value == 'true' -%}
+    {%- assign is_wholesale_customer = true -%}
+  {%- endif -%}
+  <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}{% if is_wholesale_customer %} b2b-customer{% endif %}">
     <a class="skip-to-content-link button visually-hidden" href="#MainContent">
       {{ 'accessibility.skip_to_text' | t }}
     </a>
@@ -345,15 +353,15 @@
       window.wishlistCurrency = {{ cart.currency.iso_code | json }};
       window.wishlistStorefrontAccessToken = {{ settings.storefront_access_token | strip | json }};
 
-      window.nexoraB2b = {% if customer and customer.b2b? %}true{% else %}false{% endif %};
+      window.nexoraB2b = {% if is_wholesale_customer %}true{% else %}false{% endif %};
       {%- if customer -%}
       window.nexoraCustomerId = {{ customer.id | json }};
       {%- else -%}
       window.nexoraCustomerId = null;
       {%- endif -%}
       console.debug(
-        '[Nexora] Liquid: customer and customer.b2b? →',
-        {% if customer and customer.b2b? %}true{% else %}false{% endif %},
+        '[Nexora] Liquid: wholesale context →',
+        {% if is_wholesale_customer %}true{% else %}false{% endif %},
         '| loggedIn:',
         {% if customer %}true{% else %}false{% endif %},
         '| customerId:',

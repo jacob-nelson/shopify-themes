@@ -24,6 +24,14 @@
 {%- endunless -%}
 
 <script src="{{ 'quantity-popover.js' | asset_url }}" defer="defer"></script>
+{%- assign has_pack_items = false -%}
+{%- for cart_item in cart.items -%}
+  {%- assign cart_item_pack_size = cart_item.variant.metafields.custom.pack_size.value | default: 0 | plus: 0 -%}
+  {%- if cart_item_pack_size >= 2 -%}
+    {%- assign has_pack_items = true -%}
+    {%- break -%}
+  {%- endif -%}
+{%- endfor -%}
 
 <cart-items class="gradient color-{{ section.settings.color_scheme }} isolate{% if cart == empty %} is-empty{% else %} section-{{ section.id }}-padding{% endif %}">
   <div class="page-width">
@@ -69,7 +77,11 @@
                     colspan="1"
                     scope="col"
                   >
-                    {{ 'sections.cart.headings.quantity' | t }}
+                    {%- if has_pack_items -%}
+                      {{ 'products.product.b2b.packs_label' | t }}
+                    {%- else -%}
+                      {{ 'sections.cart.headings.quantity' | t }}
+                    {%- endif -%}
                   </th>
                   <th class="small-hide right caption-with-letter-spacing" colspan="1" scope="col">
                     {{ 'sections.cart.headings.total' | t }}
@@ -79,6 +91,14 @@
 
               <tbody>
                 {%- for item in cart.items -%}
+                  {%- capture cart_pack_values_capture -%}
+                    {%- render 'b2b-pack-values', variant: item.variant, quantity: item.quantity -%}
+                  {%- endcapture -%}
+                  {%- assign cart_pack_values = cart_pack_values_capture | strip | split: '|' -%}
+                  {%- assign cart_has_pack_messaging = false -%}
+                  {%- if cart_pack_values[0] == 'true' -%}
+                    {%- assign cart_has_pack_messaging = true -%}
+                  {%- endif -%}
                   <tr
                     class="cart-item {% if item.parent_relationship.parent != null %}cart-item__nested-line{% endif %}"
                     id="CartItem-{{ item.index | plus: 1 }}"
@@ -108,7 +128,17 @@
                         <p class="caption-with-letter-spacing">{{ item.product.vendor }}</p>
                       {%- endif -%}
 
-                      <a href="{{ item.url }}" class="cart-item__name h4 break">{{ item.product.title | escape }}</a>
+                      <a href="{{ item.url }}" class="cart-item__name h4 break">
+                        {{ item.product.title | escape }}
+                        {%- if cart_has_pack_messaging -%}
+                          ({{ 'products.product.b2b.pack_of' | t: n: cart_pack_values[1] }})
+                        {%- endif -%}
+                      </a>
+                      {%- if cart_has_pack_messaging -%}
+                        <p class="product-option">
+                          {{ 'products.product.b2b.pack_of' | t: n: cart_pack_values[1] }}
+                        </p>
+                      {%- endif -%}
 
                       {%- if item.original_price != item.final_price -%}
                         <div class="cart-item__discounted-prices">
@@ -202,6 +232,22 @@
                             {{ item.original_line_price | money }}
                           </span>
                         {%- endif -%}
+                        {%- if cart_has_pack_messaging -%}
+                          {%- assign cart_pack_price_formatted = item.final_price | money_with_currency -%}
+                          {%- assign cart_line_total_formatted = item.final_line_price | money_with_currency -%}
+                          <p class="product-option">
+                            {{
+                              'products.product.b2b.line_total_formula'
+                              | t:
+                                pack_price: cart_pack_price_formatted,
+                                qty: item.quantity,
+                                line_total: cart_line_total_formatted
+                            }}
+                          </p>
+                          <p class="product-option">
+                            {{ 'products.product.b2b.total_pieces' | t: quantity: cart_pack_values[3] }}
+                          </p>
+                        {%- endif -%}
 
                         {%- if item.variant.available and item.unit_price_measurement -%}
                           {% render 'unit-price', price: item.unit_price, measurement: item.unit_price_measurement %}
@@ -232,7 +278,11 @@
                       <quantity-popover>
                         <div class="cart-item__quantity-wrapper quantity-popover-wrapper">
                           <label class="visually-hidden" for="Quantity-{{ item.index | plus: 1 }}">
-                            {{ 'products.product.quantity.label' | t }}
+                            {%- if cart_has_pack_messaging -%}
+                              {{ 'products.product.b2b.packs_label' | t }}
+                            {%- else -%}
+                              {{ 'products.product.quantity.label' | t }}
+                            {%- endif -%}
                           </label>
                           <div class="quantity-popover-container{% if has_qty_rules or has_vol_pricing %} quantity-popover-container--hover{% endif %}">
                             {%- if has_qty_rules or has_vol_pricing -%}
@@ -276,7 +326,7 @@
                                 {% endif %}
                                 step="{{ item.variant.quantity_rule.increment }}"
                                 {% # theme-check-enable %}
-                                aria-label="{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}"
+                                aria-label="{% if cart_has_pack_messaging %}{{ 'products.product.b2b.packs_input_label' | t: product: item.product.title | escape }}{% else %}{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}{% endif %}"
                                 id="Quantity-{{ item.index | plus: 1 }}"
                                 data-index="{{ item.index | plus: 1 }}"
                                 {% if can_update_quantity == false %}
@@ -442,6 +492,22 @@
                           <span class="price price--end">
                             {{ item.original_line_price | money }}
                           </span>
+                        {%- endif -%}
+                        {%- if cart_has_pack_messaging -%}
+                          {%- assign cart_pack_price_formatted = item.final_price | money_with_currency -%}
+                          {%- assign cart_line_total_formatted = item.final_line_price | money_with_currency -%}
+                          <p class="product-option">
+                            {{
+                              'products.product.b2b.line_total_formula'
+                              | t:
+                                pack_price: cart_pack_price_formatted,
+                                qty: item.quantity,
+                                line_total: cart_line_total_formatted
+                            }}
+                          </p>
+                          <p class="product-option">
+                            {{ 'products.product.b2b.total_pieces' | t: quantity: cart_pack_values[3] }}
+                          </p>
                         {%- endif -%}
 
                         {%- if item.variant.available and item.unit_price_measurement -%}

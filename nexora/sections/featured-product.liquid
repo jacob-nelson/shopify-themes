@@ -184,16 +184,8 @@
                       if product.selected_or_first_available_variant.quantity_rule.min > product_qty_min
                         assign product_qty_min = product.selected_or_first_available_variant.quantity_rule.min
                       endif
-                      assign product_b2b_case_size = product.metafields.custom.case_size.value | default: 0 | plus: 0
+                      assign product_pack_size = product.selected_or_first_available_variant.metafields.custom.pack_size.value | default: 0 | plus: 0
                       assign product_qty_step = product.selected_or_first_available_variant.quantity_rule.increment
-                      if customer and customer.b2b? and product_b2b_case_size > 1
-                        if product_b2b_case_size > product_qty_step
-                          assign product_qty_step = product_b2b_case_size
-                        endif
-                        if product_b2b_case_size > product_qty_min
-                          assign product_qty_min = product_b2b_case_size
-                        endif
-                      endif
                     -%}
                     <span class="visually-hidden" id="quantity-label-{{ section.id }}">
                       {%- if cart_qty > 0 -%}

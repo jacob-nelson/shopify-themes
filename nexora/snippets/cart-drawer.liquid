@@ -10,6 +10,14 @@
 
 <script src="{{ 'cart.js' | asset_url }}" defer="defer"></script>
 <script src="{{ 'quantity-popover.js' | asset_url }}" defer="defer"></script>
+{%- assign has_pack_items = false -%}
+{%- for cart_item in cart.items -%}
+  {%- assign cart_item_pack_size = cart_item.variant.metafields.custom.pack_size.value | default: 0 | plus: 0 -%}
+  {%- if cart_item_pack_size >= 2 -%}
+    {%- assign has_pack_items = true -%}
+    {%- break -%}
+  {%- endif -%}
+{%- endfor -%}
 
 <style>
   .drawer {
@@ -111,13 +119,27 @@
                         {{ 'sections.cart.headings.total' | t }}
                       </th>
                       <th id="CartDrawer-ColumnQuantity" role="columnheader">
-                        <span class="visually-hidden">{{ 'sections.cart.headings.quantity' | t }}</span>
+                        <span class="visually-hidden">
+                          {%- if has_pack_items -%}
+                            {{ 'products.product.b2b.packs_label' | t }}
+                          {%- else -%}
+                            {{ 'sections.cart.headings.quantity' | t }}
+                          {%- endif -%}
+                        </span>
                       </th>
                     </tr>
                   </thead>
 
                   <tbody role="rowgroup">
                     {%- for item in cart.items -%}
+                      {%- capture drawer_pack_values_capture -%}
+                        {%- render 'b2b-pack-values', variant: item.variant, quantity: item.quantity -%}
+                      {%- endcapture -%}
+                      {%- assign drawer_pack_values = drawer_pack_values_capture | strip | split: '|' -%}
+                      {%- assign drawer_has_pack_messaging = false -%}
+                      {%- if drawer_pack_values[0] == 'true' -%}
+                        {%- assign drawer_has_pack_messaging = true -%}
+                      {%- endif -%}
                       <tr
                         id="CartDrawer-Item-{{ item.index | plus: 1 }}"
                         class="cart-item{% if item.parent_relationship.parent != null %} cart-item__nested-line{% endif %}"
@@ -152,7 +174,15 @@
 
                           <a href="{{ item.url }}" class="cart-item__name h4 break">
                             {{- item.product.title | escape -}}
+                            {%- if drawer_has_pack_messaging -%}
+                              ({{ 'products.product.b2b.pack_of' | t: n: drawer_pack_values[1] }})
+                            {%- endif -%}
                           </a>
+                          {%- if drawer_has_pack_messaging -%}
+                            <p class="product-option">
+                              {{ 'products.product.b2b.pack_of' | t: n: drawer_pack_values[1] }}
+                            </p>
+                          {%- endif -%}
 
                           {%- if item.original_price != item.final_price -%}
                             <div class="cart-item__discounted-prices">
@@ -256,6 +286,22 @@
                                 {{ item.original_line_price | money }}
                               </span>
                             {%- endif -%}
+                            {%- if drawer_has_pack_messaging -%}
+                              {%- assign drawer_pack_price_formatted = item.final_price | money_with_currency -%}
+                              {%- assign drawer_line_total_formatted = item.final_line_price | money_with_currency -%}
+                              <p class="product-option">
+                                {{
+                                  'products.product.b2b.line_total_formula'
+                                  | t:
+                                    pack_price: drawer_pack_price_formatted,
+                                    qty: item.quantity,
+                                    line_total: drawer_line_total_formatted
+                                }}
+                              </p>
+                              <p class="product-option">
+                                {{ 'products.product.b2b.total_pieces' | t: quantity: drawer_pack_values[3] }}
+                              </p>
+                            {%- endif -%}
 
                             {%- if item.variant.available and item.unit_price_measurement -%}
                               {% render 'unit-price', price: item.unit_price, measurement: item.unit_price_measurement %}
@@ -325,7 +371,7 @@
                                     {% endif %}
                                     step="{{ item.variant.quantity_rule.increment }}"
                                     {% # theme-check-enable %}
-                                    aria-label="{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}"
+                                    aria-label="{% if drawer_has_pack_messaging %}{{ 'products.product.b2b.packs_input_label' | t: product: item.product.title | escape }}{% else %}{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}{% endif %}"
                                     id="Drawer-quantity-{{ item.index | plus: 1 }}"
                                     data-index="{{ item.index | plus: 1 }}"
                                     {% if item.instructions and item.instructions.can_update_quantity == false %}
@@ -531,6 +577,13 @@
             <h2 class="totals__total">{{ 'sections.cart.estimated_total' | t }}</h2>
             <p class="totals__total-value">{{ cart.total_price | money_with_currency }}</p>
           </div>
+        {%- assign drawer_has_pack_items = false -%}
+        {%- if has_pack_items -%}
+          {%- assign drawer_has_pack_items = true -%}
+        {%- endif -%}
+        {%- if drawer_has_pack_items -%}
+          <p class="caption-large">{{ 'products.product.b2b.cart_totals_hint' | t }}</p>
+        {%- endif -%}
 
           <small class="tax-note caption-large rte">
             {%- if cart.duties_included and cart.taxes_included -%}
