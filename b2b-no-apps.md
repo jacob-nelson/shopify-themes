@@ -281,12 +281,18 @@ Use a single-page form at `/pages/wholesale-registration` and mark required fiel
 On submit, create/update customer with:
 - tags: `wholesale_applied`, `wholesale_new`
 - note: serialized application snapshot (short form)
-- optional customer metafields for structured data:
-  - `b2b.company_name`
-  - `b2b.tax_id`
-  - `b2b.business_type`
-  - `b2b.status` (`new`, `in_review`, `approved`, `rejected`)
-  - `b2b.last_reviewed_at`
+- required customer metafields for structured data:
+  - `custom.company_name`
+  - `custom.tax_id`
+  - `custom.business_type`
+  - `custom.wholesale_status` (`new`, `in_review`, `approved`, `rejected`, `on_hold`)
+  - `custom.last_reviewed_at`
+
+### Status Tracking Standard
+
+- Use `custom.wholesale_status` as the primary reporting field.
+- Keep tags for quick admin filtering and staff operations.
+- On every status transition, update both tag and `custom.wholesale_status` in the same step.
 
 ## Admin SOP (Daily Operations)
 
@@ -296,8 +302,9 @@ This SOP is for a no-app team process and can run entirely from Shopify admin + 
 
 - Open saved customer view filtered by tag `wholesale_applied`.
 - Move each new record to `wholesale_in_review`.
+- Set `custom.wholesale_status=in_review`.
 - Verify required fields completeness.
-- If incomplete, send “Need more info” template and tag `wholesale_on_hold`.
+- If incomplete, send “Need more info” template, tag `wholesale_on_hold`, and set `custom.wholesale_status=on_hold`.
 
 ### 2) Verification Checklist
 
@@ -315,7 +322,8 @@ This SOP is for a no-app team process and can run entirely from Shopify admin + 
 - Update tags/metafields:
   - remove: `wholesale_applied`, `wholesale_in_review`, `wholesale_on_hold`
   - add: `wholesale_approved`
-  - set `b2b.status=approved`
+  - set `custom.wholesale_status=approved`
+  - set `custom.last_reviewed_at` to decision timestamp
 - Send approval + account activation email template.
 
 ### 4) Reject Workflow
@@ -323,7 +331,8 @@ This SOP is for a no-app team process and can run entirely from Shopify admin + 
 - Update tags/metafields:
   - remove: `wholesale_in_review`
   - add: `wholesale_rejected`
-  - set `b2b.status=rejected`
+  - set `custom.wholesale_status=rejected`
+  - set `custom.last_reviewed_at` to decision timestamp
 - Send polite rejection template (with reapply path if allowed).
 - Log internal rejection reason in staff notes.
 
@@ -351,6 +360,26 @@ This SOP is for a no-app team process and can run entirely from Shopify admin + 
   - Sales ops: verification and decision
   - Admin ops: company/catalog mapping
   - Support: customer communication
+
+## SOP Status Matrix (Copy-Ready)
+
+Use this matrix as the single operating standard for wholesale application handling.
+
+| Stage | Trigger | Owner | `custom.wholesale_status` | Required Tag | Action in Admin | Customer Email Template | SLA |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Application received | Form submitted | Support/Ops | `new` | `wholesale_applied` | Create or update customer record, store application details, queue for review | Application received | Immediate auto or within 2 hours |
+| Review started | Agent opens case | Sales Ops | `in_review` | `wholesale_in_review` | Remove `wholesale_applied`, add `wholesale_in_review`, start checks | None (internal step) | Same business day |
+| More info needed | Missing/invalid data | Sales Ops | `on_hold` | `wholesale_on_hold` | Keep case open, request missing docs, add internal note | More information required | Within 1 business day from review start |
+| Approved | All checks passed | Sales Ops + Admin Ops | `approved` | `wholesale_approved` | Create company/location, link contact, assign wholesale catalog, set `custom.last_reviewed_at` | Approved + account activation | Within 2-3 business days of submission |
+| Rejected | Failed policy checks | Sales Ops | `rejected` | `wholesale_rejected` | Add rejection reason in staff notes, set `custom.last_reviewed_at` | Rejected (optional reapply path) | Within 2-3 business days of submission |
+| Reapplied | Rejected customer submits again | Support/Ops | `new` (or `in_review` if immediately reopened) | `wholesale_reapplied` + `wholesale_applied` | Preserve previous notes, reopen case, continue normal review flow | Application received or More information required | Same business day |
+
+### Status Hygiene Rules
+
+- Keep exactly one primary status tag at a time: `wholesale_applied`, `wholesale_in_review`, `wholesale_on_hold`, `wholesale_approved`, or `wholesale_rejected`.
+- Always update `custom.wholesale_status` and tags in the same action.
+- On terminal decisions (`approved`/`rejected`), set `custom.last_reviewed_at`.
+- Do not delete historical staff notes; they are part of the audit trail.
 
 ## Ready-to-Use Email Template Subjects
 
@@ -617,8 +646,8 @@ Use this as an execution checklist for the theme developer.
 - Create/verify `Wholesale Catalog` pricing and included products.
 - Prepare B2B pack variants/SKUs for target products.
 - Populate variant metafields (`custom.pack_size`, optional `custom.base_unit_price`).
-- Prepare customer tags/status model for wholesale applications.
-- Create saved admin views for `applied`, `in_review`, `approved`, `rejected`.
+- Prepare customer tags + required metafield status model (`custom.wholesale_status`) for wholesale applications.
+- Create saved admin views for `applied`, `in_review`, `approved`, `rejected` using tags and/or `custom.wholesale_status`.
 - Finalize SOP templates (approval, rejection, more-info emails).
 
 **End-of-day output:**
