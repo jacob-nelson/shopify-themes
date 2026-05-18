@@ -1973,10 +1973,22 @@ input[type='checkbox'] {
   z-index: 2;
 }
 
+.quantity__input:focus-visible {
+  outline: 0;
+  box-shadow: none;
+  background-color: transparent;
+}
+
 .quantity__button:focus,
 .quantity__input:focus {
   background-color: rgb(var(--color-background));
   z-index: 2;
+}
+
+.quantity__input:focus {
+  outline: 0;
+  box-shadow: none;
+  background-color: transparent;
 }
 
 .quantity__button:not(:focus-visible):not(.focused),
