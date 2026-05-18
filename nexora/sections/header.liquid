@@ -241,16 +241,28 @@
       </div>
       {% render 'header-search', input_id: 'Search-In-Modal' %}
       {%- liquid
-        assign wholesale_page = pages['wholesale-registration']
-        if wholesale_page != blank
-          assign wholesale_url = wholesale_page.url
-        else
-          assign wholesale_url = routes.root_url | append: 'pages/wholesale-registration'
+        capture wholesale_context_capture
+          render 'wholesale-context', customer_object: customer
+        endcapture
+        assign wholesale_context_value = wholesale_context_capture | strip
+        assign is_wholesale_customer = false
+        if wholesale_context_value == 'true'
+          assign is_wholesale_customer = true
         endif
       -%}
-      <a href="{{ wholesale_url }}" class="header__wholesale-link link small-hide medium-hide">
-        {{ 'general.wholesale.apply' | t }}
-      </a>
+      {%- unless is_wholesale_customer -%}
+        {%- liquid
+          assign wholesale_page = pages['wholesale-registration']
+          if wholesale_page != blank
+            assign wholesale_url = wholesale_page.url
+          else
+            assign wholesale_url = routes.root_url | append: 'pages/wholesale-registration'
+          endif
+        -%}
+        <a href="{{ wholesale_url }}" class="header__wholesale-link link small-hide medium-hide">
+          {{ 'general.wholesale.apply' | t }}
+        </a>
+      {%- endunless -%}
 
       {%- if shop.customer_accounts_enabled -%}
         <a
