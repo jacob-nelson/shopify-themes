@@ -133,17 +133,6 @@
                     {%- endif -%}
                   </div>
                 {%- endif -%}
-                {%- assign current_variant_weight = product.selected_or_first_available_variant.weight | default: 0 -%}
-                <div
-                  id="Weight-{{ section.id }}"
-                  class="product__tax caption rte{% if current_variant_weight <= 0 %} hidden{% endif %}"
-                  role="status"
-                >
-                  {%- if current_variant_weight > 0 -%}
-                    {{ 'products.product.b2b.weight_label' | t }}:
-                    {{- product.selected_or_first_available_variant.weight | weight_with_unit -}}
-                  {%- endif -%}
-                </div>
                 <div {{ block.shopify_attributes }}>
                   {%- assign product_form_installment_id = 'product-form-installment-' | append: section.id -%}
                   {%- form 'product', product, id: product_form_installment_id, class: 'installment caption-large' -%}
@@ -553,6 +542,86 @@
                   section_id: section.id,
                   show_pickup_availability: true
                 -%}
+                {%- liquid
+                  assign product_specs = product.metafields.custom.package_specifications.value
+                  assign variant_specs = product.selected_or_first_available_variant.metafields.custom.package_specifications.value
+                  assign specs = product_specs
+                  if variant_specs
+                    assign specs = variant_specs
+                  endif
+
+                  assign variant_weight = ''
+                  if product.selected_or_first_available_variant.weight and product.selected_or_first_available_variant.weight > 0
+                    assign variant_weight = product.selected_or_first_available_variant.weight | weight_with_unit
+                  endif
+
+                  assign specs_weight = ''
+                  if specs and specs.weight.value != blank
+                    assign specs_weight = specs.weight.value
+                  endif
+
+                  assign display_weight = specs_weight
+                  if display_weight == blank and variant_weight != blank
+                    assign display_weight = variant_weight
+                  endif
+                -%}
+                {%- if specs or display_weight != blank -%}
+                  <details class="product__specifications" id="Specs-{{ section.id }}" role="status">
+                    <summary class="product__specifications-summary">
+                      {% render 'icon-accordion', icon: 'box' %}
+                      <span class="product__specifications-title">Package Specifications</span>
+                      {{- 'icon-caret.svg' | inline_asset_content -}}
+                    </summary>
+                    <div class="product__specifications-table">
+                      {%- if specs -%}
+                        {%- if specs.length.value != blank -%}
+                          <p class="product__specifications-row">
+                            <span class="product__specifications-label">Length</span>
+                            <span class="product__specifications-value">{{ specs.length.value }}</span>
+                          </p>
+                        {%- endif -%}
+                        {%- if specs.width.value != blank -%}
+                          <p class="product__specifications-row">
+                            <span class="product__specifications-label">Width</span>
+                            <span class="product__specifications-value">{{ specs.width.value }}</span>
+                          </p>
+                        {%- endif -%}
+                        {%- if specs.height.value != blank -%}
+                          <p class="product__specifications-row">
+                            <span class="product__specifications-label">Height</span>
+                            <span class="product__specifications-value">{{ specs.height.value }}</span>
+                          </p>
+                        {%- endif -%}
+                      {%- endif -%}
+                      {%- if display_weight != blank -%}
+                        <p class="product__specifications-row">
+                          <span class="product__specifications-label">Weight</span>
+                          <span class="product__specifications-value">{{ display_weight }}</span>
+                        </p>
+                      {%- endif -%}
+                      {%- if specs -%}
+                        {%- if specs.carton_size.value != blank -%}
+                          <p class="product__specifications-row">
+                            <span class="product__specifications-label">Carton size</span>
+                            <span class="product__specifications-value">{{ specs.carton_size.value }}</span>
+                          </p>
+                        {%- endif -%}
+                        {%- if specs.storage_temperature.value != blank -%}
+                          <p class="product__specifications-row">
+                            <span class="product__specifications-label">Storage temperature</span>
+                            <span class="product__specifications-value">{{ specs.storage_temperature.value }}</span>
+                          </p>
+                        {%- endif -%}
+                        {%- if specs.shipping_class.value != blank -%}
+                          <p class="product__specifications-row">
+                            <span class="product__specifications-label">Shipping class</span>
+                            <span class="product__specifications-value">{{ specs.shipping_class.value }}</span>
+                          </p>
+                        {%- endif -%}
+                      {%- endif -%}
+                    </div>
+                  </details>
+                {%- endif -%}
               {%- when 'rating' -%}
                 {%- if product.metafields.reviews.rating.value != blank -%}
                   <div class="rating-wrapper">

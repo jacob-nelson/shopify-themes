@@ -119,6 +119,9 @@
           </table>
         {%- else -%}
           <p>{{ 'customer.orders.none' | t }}</p>
+          <p>
+            <a href="{{ routes.root_url }}">{{ 'customer.orders.go_to_store' | t }}</a>
+          </p>
         {%- endif -%}
 
         {%- if paginate.pages > 1 -%}

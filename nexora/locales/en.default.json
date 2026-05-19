@@ -501,7 +501,8 @@
       "payment_status": "Payment status",
       "fulfillment_status": "Fulfillment status",
       "total": "Total",
-      "none": "You haven't placed any orders yet."
+      "none": "You haven't placed any orders yet.",
+      "go_to_store": "Go to store"
     },
     "recover_password": {
       "title": "Reset your password",
