@@ -566,10 +566,15 @@
                   endif
                 -%}
                 {%- if specs or display_weight != blank -%}
+                <div class="product__accordion accordion quick-add-hidden" {{ block.shopify_attributes }}>
                   <details class="product__specifications" id="Specs-{{ section.id }}" role="status">
-                    <summary class="product__specifications-summary">
-                      {% render 'icon-accordion', icon: 'box' %}
-                      <span class="product__specifications-title">Package Specifications</span>
+                    <summary>
+                      <div class="summary__title">
+                        {% render 'icon-accordion', icon: 'box' %}
+                        <h2 class="h4 accordion__title inline-richtext">
+                          Package Specifications
+                        </h2>
+                      </div>
                       {{- 'icon-caret.svg' | inline_asset_content -}}
                     </summary>
                     <div class="product__specifications-table">
@@ -621,6 +626,7 @@
                       {%- endif -%}
                     </div>
                   </details>
+                  </div>
                 {%- endif -%}
               {%- when 'rating' -%}
                 {%- if product.metafields.reviews.rating.value != blank -%}

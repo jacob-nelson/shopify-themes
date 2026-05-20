@@ -49,9 +49,11 @@
             assign wholesale_url = routes.root_url | append: 'pages/wholesale-registration'
           endif
         -%}
-        <a href="{{ wholesale_url }}">
-          {{ 'general.wholesale.apply' | t }}
-        </a>
+        {% comment %}
+          <a href="{{ wholesale_url }}">
+            {{ 'general.wholesale.apply' | t }}
+          </a>
+        {% endcomment %}
       {%- endunless -%}
     </div>
   </div>

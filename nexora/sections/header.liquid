@@ -259,9 +259,11 @@
             assign wholesale_url = routes.root_url | append: 'pages/wholesale-registration'
           endif
         -%}
-        <a href="{{ wholesale_url }}" class="header__wholesale-link link small-hide medium-hide">
-          {{ 'general.wholesale.apply' | t }}
-        </a>
+        {% comment %}
+          <a href="{{ wholesale_url }}" class="header__wholesale-link link small-hide medium-hide">
+            {{ 'general.wholesale.apply' | t }}
+          </a>
+        {% endcomment %}
       {%- endunless -%}
 
       {%- if shop.customer_accounts_enabled -%}

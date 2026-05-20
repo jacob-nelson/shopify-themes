@@ -161,9 +161,11 @@
       <a href="{{ routes.account_register_url }}">
         {{ 'customer.login_page.create_account' | t }}
       </a>
-      <a href="{{ wholesale_url }}">
-        {{ 'general.wholesale.apply' | t }}
-      </a>
+      {% comment %}
+        <a href="{{ wholesale_url }}">
+          {{ 'general.wholesale.apply' | t }}
+        </a>
+      {% endcomment %}
     {%- endform -%}
   </div>
 

@@ -222,7 +222,7 @@ product-info {
 }
 
 .product__specifications {
-  margin: 1.6rem 0;
+  margin: 0;
 }
 
 .product__specifications-summary {
