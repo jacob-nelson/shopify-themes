@@ -23,7 +23,7 @@
       </div>
     {%- endif -%}
 
-    {% form 'contact', class: 'wholesale-registration__form' %}
+    {% form 'contact', class: 'wholesale-registration__form', novalidate: 'novalidate' %}
       {%- if form.posted_successfully? -%}
         <div class="form-status form-status-list form__message" tabindex="-1" autofocus>
           <span class="svg-wrapper">{{- 'icon-success.svg' | inline_asset_content -}}</span>
@@ -37,8 +37,6 @@
       {%- endif -%}
 
       <input type="hidden" name="contact[application_type]" value="wholesale">
-      <input type="hidden" name="contact[source_page]" value="{{ request.path }}">
-      <input type="hidden" name="contact[submitted_at]" value="{{ 'now' | date: '%Y-%m-%d %H:%M:%S %z' }}">
 
       <fieldset class="wholesale-registration__fieldset">
         <legend>Business information</legend>
@@ -176,7 +174,7 @@
       </fieldset>
 
       <div class="field wholesale-registration__honeypot" aria-hidden="true">
-        <input type="text" name="contact[website_url]" id="WholesaleWebsiteUrl" tabindex="-1" autocomplete="off">
+        <input type="text" name="website_url" id="WholesaleWebsiteUrl" tabindex="-1" autocomplete="off">
         <label for="WholesaleWebsiteUrl">Website</label>
       </div>
 
@@ -301,6 +299,11 @@
     outline: 0;
   }
 
+  .wholesale-registration .field input[aria-invalid='true'],
+  .wholesale-registration .field select[aria-invalid='true'] {
+    box-shadow: inset 0 0 0 0.12rem rgba(204, 38, 49, 0.95);
+  }
+
   .wholesale-registration .field input[type='date'] {
     min-height: 4.8rem;
   }
@@ -320,6 +323,28 @@
     height: 1.7rem;
     accent-color: rgb(var(--color-foreground));
     flex-shrink: 0;
+  }
+
+  .wholesale-registration__checkbox input[aria-invalid='true'] {
+    outline: 0.12rem solid rgba(204, 38, 49, 0.95);
+    outline-offset: 0.1rem;
+  }
+
+  .wholesale-registration__field-error {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
+    line-height: 1.4;
+    color: rgb(204, 38, 49);
+  }
+
+  .wholesale-registration__checkbox .wholesale-registration__field-error {
+    margin-left: 2.7rem;
+  }
+
+  .wholesale-registration__required-indicator {
+    color: rgb(204, 38, 49);
+    margin-left: 0.2rem;
   }
 
   .wholesale-registration__submit {
@@ -360,14 +385,158 @@
 {% endstylesheet %}
 
 {% javascript %}
-  document.addEventListener('submit', function (event) {
-    var form = event.target.closest('.wholesale-registration__form');
-    if (!form) return;
-    var honeypot = form.querySelector('#WholesaleWebsiteUrl');
-    if (honeypot && honeypot.value.trim().length > 0) {
-      event.preventDefault();
+  (function () {
+    function appendRequiredIndicator(target) {
+      if (!target || target.querySelector('.wholesale-registration__required-indicator')) return;
+      var marker = document.createElement('span');
+      marker.className = 'wholesale-registration__required-indicator';
+      marker.setAttribute('aria-hidden', 'true');
+      marker.textContent = '*';
+      target.appendChild(marker);
     }
-  });
+
+    function addRequiredIndicators(form) {
+      var requiredFields = Array.prototype.slice.call(form.querySelectorAll('[required]'));
+
+      requiredFields.forEach(function (field) {
+        if (field.type === 'checkbox') {
+          var checkboxLabel = field.closest('.wholesale-registration__checkbox');
+          var checkboxText = checkboxLabel && checkboxLabel.querySelector('span');
+          appendRequiredIndicator(checkboxText);
+          return;
+        }
+
+        if (!field.id) return;
+        var associatedLabel = form.querySelector('label[for="' + field.id + '"]');
+        appendRequiredIndicator(associatedLabel);
+      });
+    }
+
+    function getValidationMessage(field) {
+      if (field.type === 'checkbox') return 'Please check this box to continue.';
+      if (field.tagName === 'SELECT') return 'Please select an option.';
+      if (field.type === 'email') {
+        if (field.value.trim().length === 0) return 'Please enter your email address.';
+        if (!field.checkValidity()) return 'Please enter a valid email address.';
+      }
+      return 'Please fill out this field.';
+    }
+
+    function getErrorContainer(field) {
+      return field.closest('.wholesale-registration__field') || field.closest('.wholesale-registration__checkbox');
+    }
+
+    function ensureErrorNode(field) {
+      var container = getErrorContainer(field);
+      if (!container) return null;
+
+      var errorNode = container.querySelector('.wholesale-registration__field-error');
+      if (!errorNode) {
+        errorNode = document.createElement('small');
+        errorNode.className = 'wholesale-registration__field-error';
+        errorNode.hidden = true;
+        errorNode.setAttribute('aria-live', 'polite');
+        container.appendChild(errorNode);
+      }
+
+      if (!field.id) {
+        field.id = 'WholesaleField' + Math.random().toString(36).slice(2, 10);
+      }
+
+      if (!errorNode.id) {
+        errorNode.id = field.id + 'Error';
+      }
+
+      field.setAttribute('aria-describedby', errorNode.id);
+      return errorNode;
+    }
+
+    function clearFieldError(field) {
+      var errorNode = ensureErrorNode(field);
+      field.removeAttribute('aria-invalid');
+      if (errorNode) {
+        errorNode.textContent = '';
+        errorNode.hidden = true;
+      }
+    }
+
+    function validateField(field) {
+      var isValid = true;
+
+      if (field.type === 'checkbox') {
+        isValid = field.checked;
+      } else if (field.value.trim().length === 0) {
+        isValid = false;
+      } else if (field.type === 'email') {
+        isValid = field.checkValidity();
+      }
+
+      if (isValid) {
+        clearFieldError(field);
+        return true;
+      }
+
+      var errorNode = ensureErrorNode(field);
+      field.setAttribute('aria-invalid', 'true');
+      if (errorNode) {
+        errorNode.textContent = getValidationMessage(field);
+        errorNode.hidden = false;
+      }
+      return false;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var form = document.querySelector('.wholesale-registration__form');
+      if (!form) return;
+
+      addRequiredIndicators(form);
+
+      form.addEventListener(
+        'invalid',
+        function (event) {
+          event.preventDefault();
+        },
+        true
+      );
+
+      form.addEventListener('submit', function (event) {
+        var honeypot = form.querySelector('#WholesaleWebsiteUrl');
+        if (honeypot && honeypot.value.trim().length > 0) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          return;
+        }
+
+        var requiredFields = Array.prototype.slice.call(form.querySelectorAll('[required]'));
+        var firstInvalidField = null;
+
+        requiredFields.forEach(function (field) {
+          var valid = validateField(field);
+          if (!valid && !firstInvalidField) firstInvalidField = field;
+        });
+
+        if (firstInvalidField) {
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          firstInvalidField.focus();
+          return false;
+        }
+      });
+
+      form.addEventListener('input', function (event) {
+        var field = event.target;
+        if (!field.hasAttribute('required')) return;
+        validateField(field);
+      });
+
+      form.addEventListener('change', function (event) {
+        var field = event.target;
+        if (!field.hasAttribute('required')) return;
+        validateField(field);
+      });
+    });
+  })();
 {% endjavascript %}
 
 {% schema %}

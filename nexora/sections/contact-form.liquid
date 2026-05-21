@@ -12,6 +12,18 @@
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
   }
+
+  .contact .field__input[aria-invalid='true'] {
+    box-shadow: inset 0 0 0 0.12rem rgba(204, 38, 49, 0.95);
+  }
+
+  .contact__field-error--client {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
+    line-height: 1.4;
+    color: rgb(204, 38, 49);
+  }
 {%- endstyle -%}
 
 <div class="color-{{ section.settings.color_scheme }} gradient">
@@ -29,7 +41,7 @@
         assign contact_form_class = 'isolate scroll-trigger animate--slide-in'
       endif
     -%}
-    {%- form 'contact', id: 'ContactForm', class: contact_form_class -%}
+    {%- form 'contact', id: 'ContactForm', class: contact_form_class, novalidate: 'novalidate' -%}
       {%- if form.posted_successfully? -%}
         <h2 class="form-status form-status-list form__message" tabindex="-1" autofocus>
           {{- 'icon-success.svg' | inline_asset_content -}}
@@ -134,6 +146,101 @@
     {%- endform -%}
   </div>
 </div>
+
+{% javascript %}
+  (function () {
+    function getMessage(field) {
+      if (field.type === 'email') {
+        if (field.value.trim().length === 0) return 'Please enter your email address.';
+        if (!field.checkValidity()) return 'Please enter a valid email address.';
+      }
+      return 'Please fill out this field.';
+    }
+
+    function ensureClientErrorNode(field) {
+      var container = field.closest('.field');
+      if (!container) return null;
+
+      var node = container.querySelector('.contact__field-error--client');
+      if (!node) {
+        node = document.createElement('small');
+        node.className = 'contact__field-error contact__field-error--client';
+        node.hidden = true;
+        node.setAttribute('aria-live', 'polite');
+        container.appendChild(node);
+      }
+
+      if (!field.id) {
+        field.id = 'ContactField' + Math.random().toString(36).slice(2, 10);
+      }
+
+      if (!node.id) {
+        node.id = field.id + '-client-error';
+      }
+
+      var describedBy = field.getAttribute('aria-describedby');
+      if (describedBy) {
+        var tokens = describedBy.split(' ');
+        if (tokens.indexOf(node.id) === -1) {
+          tokens.push(node.id);
+          field.setAttribute('aria-describedby', tokens.join(' ').trim());
+        }
+      } else {
+        field.setAttribute('aria-describedby', node.id);
+      }
+
+      return node;
+    }
+
+    function validateField(field) {
+      var isValid = field.value.trim().length > 0;
+      if (isValid && field.type === 'email') {
+        isValid = field.checkValidity();
+      }
+
+      var node = ensureClientErrorNode(field);
+      if (isValid) {
+        field.removeAttribute('aria-invalid');
+        if (node) {
+          node.textContent = '';
+          node.hidden = true;
+        }
+        return true;
+      }
+
+      field.setAttribute('aria-invalid', 'true');
+      if (node) {
+        node.textContent = getMessage(field);
+        node.hidden = false;
+      }
+      return false;
+    }
+
+    document.addEventListener('submit', function (event) {
+      var form = event.target;
+      if (!form || form.id !== 'ContactForm') return;
+
+      var requiredFields = Array.prototype.slice.call(form.querySelectorAll('[required]'));
+      var firstInvalid = null;
+
+      requiredFields.forEach(function (field) {
+        var valid = validateField(field);
+        if (!valid && !firstInvalid) firstInvalid = field;
+      });
+
+      if (firstInvalid) {
+        event.preventDefault();
+        firstInvalid.focus();
+      }
+    });
+
+    document.addEventListener('input', function (event) {
+      var field = event.target;
+      if (!field.closest('#ContactForm') || !field.hasAttribute('required')) return;
+      validateField(field);
+    });
+  })();
+{% endjavascript %}
 
 {% schema %}
 {
